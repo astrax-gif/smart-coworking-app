@@ -35,7 +35,9 @@
 
 <header class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
   <div class="flex items-center gap-3">
-    <div id="logo" class="fh w-11 h-11 flex items-center justify-center text-xl btn" aria-hidden="true">HQ</div>
+    <div id="logo" class="fh w-11 h-11 flex items-center justify-center text-xl btn overflow-hidden" aria-hidden="true">
+      <span id="logoTxt">HQ</span>
+    </div>
     <div><h1 id="bName" class="fh text-xl leading-tight">HQ Coworking</h1><p id="bSub" class="text-xs muted"></p></div>
   </div>
   <div class="card !rounded-full p-1 flex text-sm" role="group" aria-label="Switch workspace">
@@ -75,6 +77,12 @@
       <div class="raise mt-4 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div><p id="sumT" class="font-semibold">Tap a free space on the plan</p><p id="sumS" class="text-sm muted">Desks, offices and rooms are all selectable.</p></div>
         <button id="confirmBtn" disabled class="btn font-bold px-6 py-3 transition shrink-0">Confirm Booking</button>
+      </div>
+
+      <!-- Photo Gallery Section -->
+      <div class="mt-8 border-t pt-6" style="border-color:var(--line)">
+        <h4 class="fh text-xl mb-4">Workspace Preview</h4>
+        <div id="gallery" class="grid sm:grid-cols-3 gap-3"></div>
       </div>
     </section>
 
@@ -132,13 +140,25 @@ const B = {
     chips:['📍 DWTC, Sheikh Zayed Rd','🕗 Mon–Fri 08:30–18:00','🔑 24/7 for members'], plan:'8th floor plan', botName:'HQ Concierge',
     perks:['26 flexi desks and 32 private desks','2 meeting spaces','Phone booths and admin support','Direct access to DWTC exhibitions'],
     board:['🤝 Members’ coffee morning, Thursday','🎪 Exhibition week: book desks early','📦 Parcel pickup now at reception'],
-    kinds:{flex:['Flexi desk','Rate confirmed by the HQ team'],priv:['Private suite · 4 desks','Rate confirmed by the HQ team'],room:['Meeting space','Rate confirmed by the HQ team']}, wifi:'HQ-Members' },
+    kinds:{flex:['Flexi desk','Rate confirmed by the HQ team'],priv:['Private suite · 4 desks','Rate confirmed by the HQ team'],room:['Meeting space','Rate confirmed by the HQ team']}, wifi:'HQ-Members',
+    photos: [
+      { title: 'Flexi Desk Area', url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80' },
+      { title: 'Private Offices', url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=600&q=80' },
+      { title: 'Meeting Room', url: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?auto=format&fit=crop&w=600&q=80' }
+    ]
+  },
   maktabi: { name:'Maktabi Business Centre', mono:'M', sub:'Sheikh Rashid Tower · Trade Centre 2', floor:18, hours:'Mon–Fri 09:00–18:00', addr:'18th Floor, Sheikh Rashid Tower, Sheikh Zayed Road, DWTC', seed:21,
     title:'Designed for your success, on the 18th floor.', text:'Over 100 flexible desks, 30 private offices, two meeting rooms and an event space, with parking and a prestigious DWTC business address.',
     chips:['📍 DWTC, Sheikh Zayed Rd','🕘 Mon–Fri 09:00–18:00','🚗 Parking on site'], plan:'18th floor plan', botName:'Maktabi Concierge',
     perks:['100+ flexible desks, 30 private offices','Unlimited coffee and tea','Business address and mail management','Printing credits and event access'],
     board:['🥐 Members’ breakfast, first Monday','💼 Workshop: setting up in the free zone','🎤 Event space open for member bookings'],
-    kinds:{flex:['Flexible desk','From AED 16.50 / hour (listed rate)'],priv:['Private office','Rate confirmed by the Maktabi team'],room:['Meeting room','Rate confirmed by the Maktabi team'],event:['Event space','Rate confirmed by the Maktabi team']}, wifi:'Maktabi-Guest' }
+    kinds:{flex:['Flexible desk','From AED 16.50 / hour (listed rate)'],priv:['Private office','Rate confirmed by the Maktabi team'],room:['Meeting room','Rate confirmed by the Maktabi team'],event:['Event space','Rate confirmed by the Maktabi team']}, wifi:'Maktabi-Guest',
+    photos: [
+      { title: 'Executive Suites', url: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=600&q=80' },
+      { title: 'Event Space', url: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=600&q=80' },
+      { title: 'Lounge & Coffee Bar', url: 'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=600&q=80' }
+    ]
+  }
 };
 const SLOTS = ['09:00 – 12:00','12:00 – 15:00','15:00 – 18:00','Full day'];
 const $ = s => document.querySelector(s);
@@ -181,11 +201,17 @@ function summary() {
 function setBrand(b) {
   brand = b; picked = null; const d = B[b]; items = build(b);
   document.body.dataset.brand = b;
-  $('#bName').textContent = d.name; $('#bSub').textContent = d.sub; $('#logo').textContent = d.mono; $('#bLogo').textContent = d.mono; $('#bot').textContent = d.botName;
+  $('#bName').textContent = d.name; $('#bSub').textContent = d.sub; $('#logoTxt').textContent = d.mono; $('#bLogo').textContent = d.mono; $('#bot').textContent = d.botName;
   $('#hTitle').textContent = d.title; $('#hText').textContent = d.text; $('#planT').textContent = d.plan; document.title = d.name + ' · Tenant Portal';
   $('#chips').innerHTML = d.chips.map(c => `<span class="chip px-3 py-1.5">${c}</span>`).join('');
   $('#perks').innerHTML = d.perks.map(p => `<li class="flex gap-2"><span class="accent">✓</span>${p}</li>`).join('');
   $('#board').innerHTML = d.board.map(p => `<li class="raise p-3 muted">${p}</li>`).join('');
+  $('#gallery').innerHTML = d.photos.map(p => `
+    <div class="raise overflow-hidden group rounded-lg">
+      <img src="${p.url}" alt="${p.title}" class="w-full h-28 object-cover group-hover:scale-105 transition duration-300" />
+      <div class="p-2 text-xs font-semibold text-center muted">${p.title}</div>
+    </div>
+  `).join('');
   const y = 247 - d.floor * 5.9; $('#band').setAttribute('y', y); $('#bandT').setAttribute('y', y + 7); $('#bandT').textContent = d.floor + 'F'; $('#floorBig').textContent = d.floor + 'F';
   document.querySelectorAll('.bb').forEach(el => { const on = el.dataset.b === b; el.classList.toggle('btn', on); el.classList.toggle('muted', !on); el.setAttribute('aria-pressed', on); });
   stats(); summary(); resetChat();

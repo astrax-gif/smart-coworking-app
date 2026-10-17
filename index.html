@@ -1,86 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Tenant Portal · Sheikh Rashid Tower, DWTC</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-  :root { --bg:#0a1730; --surface:#10213f; --raise:#17294b; --line:#2a406a; --text:#eef2fa; --muted:#98a6c2; --accent:#d4a84b; --ink:#171103; --r:18px; --fh:'Sora',sans-serif; --hw:600; }
-  [data-brand="maktabi"] { --bg:#22090f; --surface:#32111b; --raise:#431a27; --line:#6a2d3d; --text:#fcf1f1; --muted:#cba5ab; --accent:#e84a5f; --ink:#fff; --r:3px; --fh:'Cormorant Garamond',serif; --hw:700; }
-  html, body { font-family:'Manrope',system-ui,sans-serif; color:var(--text); background:radial-gradient(900px 420px at 85% -8%, color-mix(in srgb,var(--accent) 20%,transparent), transparent), var(--bg); background-attachment:fixed; transition:background .4s,color .4s; }
-  .fh { font-family:var(--fh); font-weight:var(--hw); letter-spacing:-.01em; }
-  .card { background:color-mix(in srgb,var(--surface) 88%,transparent); border:1px solid var(--line); border-radius:var(--r); backdrop-filter:blur(8px); }
-  .chip { border:1px solid var(--line); border-radius:999px; }
-  .raise { background:var(--raise); border-radius:calc(var(--r) * .7); }
-  .muted { color:var(--muted); } .accent { color:var(--accent); }
-  .btn { background:var(--accent); color:var(--ink); border-radius:calc(var(--r) * .7); }
-  .btn:hover:not(:disabled) { filter:brightness(1.12); } .btn:disabled { opacity:.35; cursor:not-allowed; }
-  .on { border-color:var(--accent) !important; box-shadow:0 0 0 1px var(--accent); }
-  .field { background:var(--bg); border:1px solid var(--line); color:var(--text); border-radius:calc(var(--r) * .6); }
-  .field:focus { outline:none; border-color:var(--accent); }
-  :focus-visible { outline:2px solid var(--accent); outline-offset:2px; }
-  .pop { animation:pop .22s ease-out; } @keyframes pop { from{opacity:0;transform:translateY(10px) scale(.98)} to{opacity:1;transform:none} }
-  .dot { animation:blink 1.2s infinite; } .dot:nth-child(2){animation-delay:.2s} .dot:nth-child(3){animation-delay:.4s}
-  @keyframes blink { 0%,80%,100%{opacity:.25} 40%{opacity:1} }
-  .u { cursor:pointer; transition:fill .15s; } .u.free { fill:rgba(52,211,153,.2); stroke:#34d399; } .u.free:hover { fill:rgba(52,211,153,.45); }
-  .u.occ { fill:rgba(255,255,255,.05); stroke:var(--line); cursor:not-allowed; } .u.sel { fill:var(--accent); stroke:var(--accent); }
-  .zone { fill:none; stroke:var(--line); stroke-dasharray:4 4; }
-  .win { fill:var(--accent); opacity:.4; } .band { fill:var(--accent); } .tw { fill:var(--raise); stroke:var(--line); }
-  @media (prefers-reduced-motion:reduce){ .pop,.dot{animation:none} html,body{transition:none} }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Workspace & Tenant Portal</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="min-h-screen antialiased" data-brand="hq">
+<body class="bg-slate-900 text-white font-sans antialiased min-h-screen">
 
-<header class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
-  <div class="flex items-center gap-3">
-    <!-- Visual Logo Container with real image support -->
-    <div id="logoBox" class="w-12 h-12 rounded-xl p-1.5 flex items-center justify-center bg-white/10 border border-white/20 shadow-lg shrink-0">
-      <img id="brandLogo" src="https://img.icons8.com/color/96/company.png" alt="Workspace Logo" class="w-full h-full object-contain" />
+  <!-- Navigation -->
+  <nav class="border-b border-slate-800 p-4 flex justify-between items-center max-w-6xl mx-auto">
+    <div class="flex items-center gap-2">
+      <span class="text-2xl">🏢</span>
+      <h1 class="font-bold text-xl tracking-tight">DWTC WorkHub Portal</h1>
     </div>
-    <div><h1 id="bName" class="fh text-xl leading-tight">HQ Coworking</h1><p id="bSub" class="text-xs muted"></p></div>
-  </div>
-  <div class="card !rounded-full p-1 flex text-sm" role="group" aria-label="Switch workspace">
-    <button data-b="hq" class="bb px-4 py-1.5 rounded-full font-semibold">HQ</button>
-    <button data-b="maktabi" class="bb px-4 py-1.5 rounded-full font-semibold">Maktabi</button>
-  </div>
-</header>
+    <span class="text-xs bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full border border-emerald-500/20">Live Demo</span>
+  </nav>
 
-<main class="max-w-6xl mx-auto px-4 sm:px-6 pb-24">
-  <!-- Hero -->
-  <section class="grid md:grid-cols-5 gap-6 items-center py-6 md:py-10">
-    <div class="md:col-span-3">
-      <h2 id="hTitle" class="fh text-4xl sm:text-6xl leading-[1.02]"></h2>
-      <p id="hText" class="muted mt-4 max-w-xl text-lg"></p>
-      <div id="chips" class="flex flex-wrap gap-2 mt-6 text-sm"></div>
-    </div>
-    <div class="md:col-span-2 card p-4 flex items-end justify-center gap-4">
-      <svg viewBox="0 0 220 250" class="w-44 sm:w-52" role="img" aria-label="Tower with the workspace floor highlighted">
-        <defs><pattern id="w" width="9" height="6" patternUnits="userSpaceOnUse"><rect class="win" x="2" y="1.5" width="5" height="3"/></pattern></defs>
-        <rect class="tw" x="8" y="170" width="44" height="70"/><rect class="tw" x="168" y="150" width="44" height="90"/>
-        <rect class="tw" x="64" y="10" width="92" height="230"/><rect x="64" y="10" width="92" height="230" fill="url(#w)"/>
-        <rect id="band" class="band" x="60" width="100" height="7"/><text id="bandT" x="168" font-size="11" class="accent" fill="currentColor" font-weight="700"></text>
-        <rect x="0" y="240" width="220" height="2" fill="currentColor" opacity=".2"/>
-      </svg>
-      <div class="pb-2"><p id="floorBig" class="fh text-5xl accent"></p><p class="text-xs muted">of 39 floors<br>Sheikh Rashid Tower</p></div>
-    </div>
-  </section>
+  <!-- Main Container -->
+  <main class="max-w-6xl mx-auto p-6 grid md:grid-cols-3 gap-8 mt-6">
 
-  <div class="grid lg:grid-cols-3 gap-6">
-    <!-- Floor plan -->
-    <section class="lg:col-span-2 card p-5 sm:p-6">
-      <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
-        <h3 id="planT" class="fh text-2xl"></h3>
-        <div class="flex gap-4 text-xs muted"><span><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1 bg-emerald-400/60"></i>Free</span><span><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1" style="background:var(--line)"></i>Taken</span><span><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1" style="background:var(--accent)"></i>Yours</span></div>
-      </div>
-      <svg id="plan" class="w-full" role="group" aria-label="Floor plan"></svg>
-      <div class="raise mt-4 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div><p id="sumT" class="font-semibold">Tap a free space on the plan</p><p id="sumS" class="text-sm muted">Desks, offices and rooms are all selectable.</p></div>
-        <button id="confirmBtn" disabled class="btn font-bold px-6 py-3 transition shrink-0">Confirm Booking</button>
+    <!-- Left Column: Desk Booking Widget -->
+    <div class="md:col-span-2 bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50">
+      <h2 class="text-lg font-semibold mb-4 text-slate-200">Reserve a Space</h2>
+      
+      <div class="grid sm:grid-cols-3 gap-4 mb-6">
+        <div class="bg-slate-800 p-4 rounded-xl border border-emerald-500/50 cursor-pointer hover:border-emerald-400 transition">
+          <p class="text-xs text-emerald-400 font-medium">Available</p>
+          <h3 class="font-bold text-slate-100 mt-1">Hot Desk A1</h3>
+          <p class="text-xs text-slate-400 mt-2">Quiet Zone • Power Outlets</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 cursor-pointer hover:border-slate-500 transition">
+          <p class="text-xs text-emerald-400 font-medium">Available</p>
+          <h3 class="font-bold text-slate-100 mt-1">Meeting Pod 2</h3>
+          <p class="text-xs text-slate-400 mt-2">4 Persons • TV Screen</p>
+        </div>
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 opacity-60">
+          <p class="text-xs text-rose-400 font-medium">Occupied</p>
+          <h3 class="font-bold text-slate-100 mt-1">Podcast Studio</h3>
+          <p class="text-xs text-slate-400 mt-2">Acoustic Foam • Mic Kit</p>
+        </div>
       </div>
 
-      <!-- Photo Gallery Section -->
-      <div class="mt-8 border-t pt-6" style="border-color:var(--line)">
-        <h4 class="fh text-xl mb-4">Workspace Preview</h4>
-        <div id
+      <button onclick="alert('Booking Confirmed! Pass sent to WhatsApp.')" class="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3 rounded-xl transition">
+        Confirm Booking (1-Click)
+      </button>
+    </div>
+
+    <!-- Right Column: Tenant Info -->
+    <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700/50">
+      <h2 class="text-lg font-semibold mb-4 text-slate-200">Community Board</h2>
+      <ul class="space-y-3 text-sm text-slate-400">
+        <li class="p-3 bg-slate-800 rounded-lg border border-slate-700/50">☕ Free Specialty Coffee at ABC Roasters for Members</li>
+        <li class="p-3 bg-slate-800 rounded-lg border border-slate-700/50">📶 Ultra-fast Wi-Fi 6 Enabled in Main Lounge</li>
+      </ul>
+    </div>
+
+  </main>
+
+  <!-- AI Concierge Floating Button -->
+  <div class="fixed bottom-6 right-6">
+    <button onclick="alert('AI Tenant Support: How can I help you today? \n1. Wi-Fi Assist \n2. Guest Pass \n3. Maintenance')" class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-5 py-3 rounded-full shadow-lg flex items-center gap-2 transition">
+      <span>🤖</span> AI Tenant Support
+    </button>
+  </div>
+
+</body>
+</html>

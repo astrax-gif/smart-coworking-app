@@ -256,6 +256,25 @@ $('#fab').addEventListener('click', () => chat(true)); $('#cClose').addEventList
 $('#reportBtn').addEventListener('click', () => { chat(true); send('Report Facility Issue'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeM(); chat(false); } });
 setBrand('hq');
+</script> 
+<script>
+  const toggleBtn = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeLabel = document.getElementById('theme-label');
+
+  // Toggle between Dark and Light mode
+  toggleBtn.addEventListener('click', () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    if (currentTheme === 'light') {
+      document.documentElement.removeAttribute('data-theme');
+      themeIcon.textContent = '🌙';
+      themeLabel.textContent = 'Dark';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      themeIcon.textContent = '☀️';
+      themeLabel.textContent = 'Light';
+    }
+  });
 </script>
 </body>
 </html>

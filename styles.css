@@ -1,0 +1,34 @@
+/* Custom variables & background */
+html, body {
+  font-family: 'Manrope', system-ui, sans-serif;
+  color: var(--text);
+  background-image: linear-gradient(rgba(10, 23, 48, 0.75), rgba(10, 23, 48, 0.85)), 
+                    url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  transition: background .4s, color .4s;
+}
+
+/* Yellow booking selection color */
+.u.sel {
+  fill: #facc15 !important;
+  stroke: #eab308 !important;
+}
+
+/* Semi-transparent & blurred floor plan container */
+.card {
+  background: rgba(16, 33, 63, 0.45) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+}
+
+/* Semi-transparent chatbot window */
+#chat, [id*="chat"] {
+  background: rgba(16, 33, 63, 0.75) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}

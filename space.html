@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Space details · Tenant Portal</title>
+<script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen antialiased">
+
+<header class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+  <div class="flex items-center gap-3">
+    <a id="back" class="back-link" href="index.html"><svg class="ico" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>Floor plan</a>
+    <div class="fh w-10 h-10 flex items-center justify-center text-lg btn" aria-hidden="true"><span id="logoTxt">HQ</span></div>
+    <p id="bName" class="fh text-2xl hidden sm:block"></p>
+  </div>
+  <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light theme">
+    <svg class="ico i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+    <svg class="ico i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+    <span id="theme-label">Dark</span>
+  </button>
+</header>
+
+<main id="app" class="max-w-6xl mx-auto px-4 sm:px-6 pb-20"></main>
+
+<script src="data.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const q = new URLSearchParams(location.search);
+const brand = B[q.get('b')] ? q.get('b') : 'hq', d = B[brand], id = q.get('id');
+const items = build(brand), bk = getBookings()[brand] || {};
+items.forEach(u => { if (bk[u.id]) { u.free = false; u.mine = true; } });
+const u = items.find(x => x.id === id);
+const app = $('#app');
+$('#bName').textContent = d.name; $('#logoTxt').textContent = d.mono; $('#back').href = 'index.html';
+
+function badge(u) {
+  return u.mine ? `<span class="badge badge-sel">${ic('check')}Yours</span>`
+    : u.free ? `<span class="badge badge-free">${ic('check')}Free to book</span>`
+    : `<span class="badge badge-occ">${ic('lock')}Taken</span>`;
+}
+const opts = (name, list, type, checked) => list.map((o, i) => {
+  const [icon, label] = Array.isArray(o) ? o : [null, o];
+  return `<label class="opt"><input type="${type}" name="${name}" value="${esc(label)}" ${checked && i === 0 ? 'checked' : ''}><span>${icon ? ic(icon) : ''}${esc(label)}</span></label>`;
+}).join('');
+
+function render() {
+  if (!u) {
+    app.innerHTML = `<div class="card p-8 max-w-xl"><h1 class="fh text-4xl">Space not found</h1><p class="muted mt-2">That space is not on this floor plan.</p><a class="btn inline-block px-5 py-3 mt-5" style="text-decoration:none" href="index.html">Back to floor plan</a></div>`;
+    return;
+  }
+  document.title = `${u.label} · ${d.name}`;
+  const k = d.kinds[u.kind], P = PREFS[u.kind];
+  const sibs = items.filter(x => x.kind === u.kind && x.free && x.id !== u.id).slice(0, 8);
+
+  const left = `
+    <div class="lg:col-span-3 space-y-6">
+      <div class="hero-photo" style="background-image:url('${KIND_PHOTO[u.kind]}')">${badge(u)}</div>
+      <div class="card p-6">
+        <p class="text-sm muted flex items-center gap-1">${ic('pin')}${d.floor}F · Sheikh Rashid Tower · Sheikh Zayed Road</p>
+        <h1 class="fh text-5xl mt-1">${u.label}</h1>
+        <p class="accent font-semibold mt-1">${k[0]}</p>
+        <p class="mt-4">${KIND_DESC[u.kind]}</p>
+        <h2 class="fh text-2xl mt-6 mb-3">Amenities</h2>
+        <ul class="grid sm:grid-cols-2 gap-2 text-sm">${AM[u.kind].map(([i, t]) => `<li class="raise flex items-center gap-2 px-3 py-2.5"><span class="accent">${ic(i)}</span>${t}</li>`).join('')}</ul>
+        <h2 class="fh text-2xl mt-6 mb-3">Good to know</h2>
+        <dl class="grid grid-cols-2 gap-y-2 text-sm"><dt class="muted">Rate</dt><dd class="font-semibold">${k[1]}</dd><dt class="muted">Opening hours</dt><dd class="font-semibold">${d.hours}</dd><dt class="muted">Wi-Fi</dt><dd class="font-semibold">${d.wifi}</dd><dt class="muted">Workspace</dt><dd class="font-semibold">${d.name}</dd></dl>
+      </div>
+      ${sibs.length && !u.free ? `<div class="card p-6"><h2 class="fh text-2xl mb-3">Other free ${k[0].toLowerCase()} spaces</h2><div class="flex flex-wrap gap-2">${sibs.map(s => `<a class="sib" href="space.html?b=${brand}&id=${s.id}">${s.label}</a>`).join('')}</div></div>` : ''}
+    </div>`;
+
+  let right;
+  if (u.mine) {
+    const b = bk[u.id];
+    right = `<div class="card p-6"><span class="badge badge-sel">${ic('check')}Your booking</span><h2 class="fh text-3xl mt-3">${u.label} is yours</h2>${summary(b)}
+      <div class="flex gap-2 mt-5"><a class="btn flex-1 py-3 text-center" style="text-decoration:none" href="index.html">Back to floor plan</a><button id="cancel" class="raise flex-1 py-3 font-semibold">Cancel booking</button></div></div>`;
+  } else if (!u.free) {
+    right = `<div class="card p-6"><span class="badge badge-occ">${ic('lock')}Taken</span><h2 class="fh text-3xl mt-3">Not available</h2><p class="muted mt-2">${u.label} is already booked. Pick a free space on the plan, or use one of the links on this page.</p><a class="btn inline-block px-5 py-3 mt-5" style="text-decoration:none" href="index.html">Back to floor plan</a></div>`;
+  } else {
+    const today = new Date().toISOString().slice(0, 10);
+    right = `<form id="form" class="card p-6 space-y-5" novalidate>
+      <div><h2 class="fh text-3xl">Book ${u.label}</h2><p class="text-sm muted">Choose your preferences. The team confirms details after you reserve.</p></div>
+      <div><label class="block text-sm mb-1" for="date">Date</label><input id="date" type="date" min="${today}" value="${today}" class="field w-full px-3 py-2.5"/></div>
+      <fieldset><legend class="text-sm mb-2">Time slot</legend><div class="flex flex-wrap gap-2">${opts('slot', SLOTS, 'radio', true)}</div></fieldset>
+      <fieldset><legend class="text-sm mb-2">Drinks on arrival</legend><div class="flex flex-wrap gap-2">${opts('drinks', DRINKS.map(x => [x === 'None' ? 'x' : 'coffee', x]), 'radio', true)}</div></fieldset>
+      <fieldset><legend class="text-sm mb-2">${u.kind === 'room' || u.kind === 'event' ? 'Room layout' : 'Seating'}</legend><div class="flex flex-wrap gap-2">${opts('setup', P.setup, 'radio', true)}</div></fieldset>
+      <fieldset><legend class="text-sm mb-2">Extras</legend><div class="flex flex-wrap gap-2">${opts('extras', P.extras, 'checkbox', false)}</div></fieldset>
+      <div><label class="block text-sm mb-1" for="notes">Anything else? (optional)</label><textarea id="notes" rows="2" class="field w-full px-3 py-2.5" placeholder="For example: oat milk, near a window"></textarea></div>
+      <div class="grid sm:grid-cols-2 gap-3"><div><label class="block text-sm mb-1" for="fN">Full name</label><input id="fN" class="field w-full px-3 py-2.5" autocomplete="name"/></div><div><label class="block text-sm mb-1" for="fE">Email</label><input id="fE" type="email" class="field w-full px-3 py-2.5" autocomplete="email"/></div></div>
+      <p id="err" class="text-sm err-text hidden" role="alert"></p>
+      <button class="btn w-full py-3.5 text-base">Reserve ${u.label}</button>
+    </form>`;
+  }
+  app.innerHTML = `<div class="grid lg:grid-cols-5 gap-6 items-start pt-2">${left}<div class="lg:col-span-2 lg:sticky lg:top-6" id="side">${right}</div></div>`;
+
+  const form = $('#form');
+  if (form) form.addEventListener('submit', onSubmit);
+  const c = $('#cancel'); if (c) c.addEventListener('click', () => { removeBooking(brand, u.id); location.reload(); });
+}
+
+function summary(b) {
+  const rows = [['Reference', b.ref], ['Name', b.name], ['Date', b.date], ['Time', b.slot], ['Drinks', b.drinks], ['Setup', b.setup], ['Extras', b.extras.length ? b.extras.join(', ') : 'None']];
+  if (b.notes) rows.push(['Notes', b.notes]);
+  return `<div class="raise p-4 mt-4 text-sm space-y-1.5">${rows.map(([a, v]) => `<div class="flex justify-between gap-4"><span class="muted">${a}</span><span class="font-semibold text-right">${esc(v)}</span></div>`).join('')}</div>`;
+}
+
+function onSubmit(e) {
+  e.preventDefault();
+  const f = e.target, v = n => (f.querySelector(`[name="${n}"]:checked`) || {}).value, err = $('#err');
+  const bad = t => { err.textContent = t; err.classList.remove('hidden'); };
+  const name = $('#fN').value.trim(), email = $('#fE').value.trim();
+  if (!$('#date').value) return bad('Choose a date.');
+  if (!name) return bad('Enter your full name.');
+  if (!/^\S+@\S+\.\S+$/.test(email)) return bad('Enter a valid email address.');
+  const data = {
+    ref: d.mono.replace('M', 'MK') + '-' + Math.floor(1000 + Math.random() * 9000), name, email, date: $('#date').value,
+    slot: v('slot'), drinks: v('drinks'), setup: v('setup'), notes: $('#notes').value.trim(),
+    extras: [...f.querySelectorAll('[name="extras"]:checked')].map(x => x.value)
+  };
+  saveBooking(brand, u.id, data);
+  $('#side').innerHTML = `<div class="card p-6 text-center"><div class="w-14 h-14 rounded-full btn mx-auto flex items-center justify-center mb-4"><svg class="ico" style="width:28px;height:28px;stroke-width:3" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+    <h2 class="fh text-3xl">You're booked in</h2><p class="muted text-sm mt-2">Check in at reception, ${d.floor}th floor. A confirmation was sent to ${esc(email)}.</p>
+    <div class="text-left">${summary(data)}</div><a class="btn block py-3 mt-5" style="text-decoration:none" href="index.html">Back to floor plan</a></div>`;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+render(); initTheme();
+</script>
+</body>
+</html>

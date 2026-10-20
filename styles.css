@@ -1,155 +1,300 @@
 /* =========================================================
-   1. COLOR PALETTES & THEME VARIABLES
+   HQ Coworking · Tenant Portal  —  styles.css
+   Dark = default. Light = <html data-theme="light">
    ========================================================= */
 
-/* Dark Theme (Default) */
+/* 1. THEME TOKENS ---------------------------------------- */
 :root {
-  --bg-color: #0b132b;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --card-bg: rgba(15, 23, 42, 0.65);
-  --card-border: rgba(255, 255, 255, 0.15);
-  --header-bg: rgba(11, 19, 43, 0.8);
-  --accent-yellow: #facc15;
-  --accent-yellow-stroke: #eab308;
-  
-  /* HQ Night Background */
-  --bg-image: linear-gradient(to bottom, rgba(11, 19, 43, 0.82), rgba(15, 23, 42, 0.88)), 
-              url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1920&q=80');
-              
-  /* 8F Building Graphic Styling (Dark Mode) */
-  --bldg-glass: rgba(56, 189, 248, 0.25);
-  --bldg-frame: rgba(255, 255, 255, 0.2);
-  --bldg-light: #fef08a;
+  color-scheme: dark;
+  --r: 16px;
+
+  /* Brand */
+  --accent: #facc15;            /* "Yours" / primary buttons */
+  --accent-stroke: #eab308;
+  --accent-text: #facc15;       /* accent used as TEXT */
+  --ink: #0b132b;               /* text that sits on yellow */
+
+  /* Text */
+  --text: #f8fafc;
+  --muted: #b8c4d6;
+
+  /* Surfaces */
+  --glass: rgba(15, 23, 42, 0.5);        /* booking panel */
+  --glass-soft: rgba(15, 23, 42, 0.62);  /* side cards */
+  --glass-chat: rgba(15, 23, 42, 0.6);   /* chatbot */
+  --surface: #121c3d;                    /* modals: solid for legibility */
+  --raise: rgba(255, 255, 255, 0.08);
+  --line: rgba(255, 255, 255, 0.2);
+
+  /* Form fields */
+  --field-bg: #0b132b;
+  --field-text: #ffffff;
+  --field-ph: #8fa0b8;
+  --field-line: rgba(255, 255, 255, 0.35);
+
+  /* Desk states */
+  --free-fill: rgba(16, 185, 129, 0.30);
+  --free-stroke: #34d399;
+  --free-glow: rgba(52, 211, 153, 0.75);
+  --free-text: #d1fae5;
+  --occ-fill: rgba(100, 116, 139, 0.32);
+  --occ-stroke: rgba(148, 163, 184, 0.45);
+  --occ-text: #94a3b8;
+
+  /* Tower graphic */
+  --glass-a: rgba(125, 211, 252, 0.55);
+  --glass-b: rgba(30, 64, 120, 0.85);
+  --glass-c: rgba(11, 19, 43, 0.95);
+  --bldg-frame: rgba(255, 255, 255, 0.28);
+  --bldg-side: rgba(148, 163, 184, 0.3);
+
+  /* Page background: overlay + photo. Layers load in order: your own file in /images,
+     then an online photo of the tower, then a generic skyline. First one that loads wins. */
+  --bg-base: #0b132b;
+  --bg-overlay: rgba(11, 19, 43, 0.85);
+  --bg-photo: url('images/hq-tower-night.jpg'),
+    url('https://www.dubai-online.com/wp-content/uploads/2019/10/ss_1077576197.jpg'),
+    url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1920&q=80');
 }
 
-/* Light Theme */
 [data-theme="light"] {
-  --bg-color: #f8fafc;
-  --text-main: #0f172a;
-  --text-muted: #475569;
-  --card-bg: rgba(255, 255, 255, 0.75);
-  --card-border: rgba(15, 23, 42, 0.12);
-  --header-bg: rgba(255, 255, 255, 0.85);
-  --accent-yellow: #eab308;
-  --accent-yellow-stroke: #ca8a04;
-  
-  /* HQ Daylight Background */
-  --bg-image: linear-gradient(to bottom, rgba(248, 250, 252, 0.7), rgba(241, 245, 249, 0.85)), 
-              url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80');
+  color-scheme: light;
+  --accent-text: #a16207;       /* yellow is unreadable as text on white */
+  --text: #0f172a;
+  --muted: #475569;
 
-  /* 8F Building Graphic Styling (Light Mode) */
-  --bldg-glass: rgba(14, 165, 233, 0.2);
-  --bldg-frame: rgba(15, 23, 42, 0.25);
-  --bldg-light: #f59e0b;
+  --glass: rgba(255, 255, 255, 0.6);
+  --glass-soft: rgba(255, 255, 255, 0.72);
+  --glass-chat: rgba(255, 255, 255, 0.7);
+  --surface: #ffffff;
+  --raise: rgba(15, 23, 42, 0.05);
+  --line: rgba(15, 23, 42, 0.18);
+
+  --field-bg: #ffffff;
+  --field-text: #0f172a;
+  --field-ph: #64748b;
+  --field-line: rgba(15, 23, 42, 0.4);
+
+  --free-fill: rgba(16, 185, 129, 0.22);
+  --free-stroke: #059669;
+  --free-glow: rgba(5, 150, 105, 0.55);
+  --free-text: #065f46;
+  --occ-fill: rgba(100, 116, 139, 0.26);
+  --occ-stroke: rgba(71, 85, 105, 0.4);
+  --occ-text: #475569;
+
+  --glass-a: rgba(186, 230, 253, 0.9);
+  --glass-b: rgba(56, 148, 210, 0.7);
+  --glass-c: rgba(30, 80, 140, 0.85);
+  --bldg-frame: rgba(255, 255, 255, 0.55);
+  --bldg-side: rgba(71, 85, 105, 0.3);
+
+  --bg-base: #f8fafc;
+  --bg-overlay: rgba(248, 250, 252, 0.85);
+  --bg-photo: url('images/hq-tower-day.jpg'),
+    url('https://www.dubai-online.com/wp-content/uploads/2019/10/ss_1077576197.jpg'),
+    url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80');
 }
 
-/* =========================================================
-   2. GENERAL & LAYOUT STYLES
-   ========================================================= */
-html, body {
+/* 2. PAGE + THEMED HQ BACKGROUND -------------------------- */
+html, body { min-height: 100%; }
+body {
   font-family: 'Manrope', system-ui, sans-serif;
-  color: var(--text-main);
-  background: var(--bg-color);
-  background-image: var(--bg-image);
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-  min-height: 100vh;
-  transition: background 0.4s ease, color 0.4s ease;
+  color: var(--text);
+  background: var(--bg-base);
+  transition: color .4s ease;
 }
-
-/* Header Glassmorphism */
-header {
-  background: var(--header-bg) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--card-border);
+/* Fixed photo layer: overlay on top, photo below. Cross-fades on toggle. */
+body::before, body::after {
+  content: ""; position: fixed; inset: 0; z-index: -2;
+  background-size: cover; background-position: center; background-repeat: no-repeat;
 }
+body::before {                       /* photo (changes with theme) */
+  background-image: var(--bg-photo);
+  transition: opacity .5s ease;
+}
+body::after {                        /* soft gradient overlay */
+  z-index: -1;
+  background: linear-gradient(to bottom, var(--bg-overlay), var(--bg-overlay));
+  transition: background .4s ease;
+}
+body.swap::before { opacity: 0; }    /* JS sets this briefly during toggle */
 
-/* Glassmorphism Cards & Panels */
+.fh { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 700; letter-spacing: -.01em; }
+.muted { color: var(--muted); }
+.accent { color: var(--accent-text); }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* 3. GLASS SURFACES --------------------------------------- */
 .card {
-  background: var(--card-bg) !important;
-  backdrop-filter: blur(16px) !important;
-  -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid var(--card-border) !important;
-  border-radius: 16px;
-  color: var(--text-main);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  transition: background 0.4s ease, border-color 0.4s ease;
+  background: var(--glass-soft);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  color: var(--text);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+  transition: background .4s ease, border-color .4s ease;
 }
+/* Booking panel ("8th Floor Plan") */
+.glass-panel {
+  background: var(--glass);              /* dark: rgba(15,23,42,.5) */
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+}
+.raise {
+  background: var(--raise); border: 1px solid var(--line);
+  border-radius: calc(var(--r) * .7); color: var(--text);
+}
+.chip {
+  display: inline-flex; align-items: center; gap: .5rem;
+  background: var(--glass-soft); border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  border-radius: 999px; color: var(--text); font-weight: 600;
+}
+.chip svg { color: var(--accent-text); }
+.ico { width: 1.1em; height: 1.1em; flex: none; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 
-/* =========================================================
-   3. BOOKING SELECTION (YELLOW) & CHATBOT
-   ========================================================= */
-/* Desk Booking Selection Color */
+/* 4. BUTTONS + THEME TOGGLE ------------------------------- */
+.btn {
+  background: var(--accent); color: var(--ink);
+  border: 0; border-radius: calc(var(--r) * .7); font-weight: 700;
+  cursor: pointer; transition: filter .2s, transform .2s;
+}
+.btn:hover:not(:disabled) { filter: brightness(1.08); }
+.btn:disabled { background: var(--raise); color: var(--muted); border: 1px solid var(--line); cursor: not-allowed; }
+.bb { color: var(--muted); transition: background .2s, color .2s; }
+.bb.btn { color: var(--ink); }
+
+.theme-toggle {
+  display: inline-flex; align-items: center; gap: .5rem;
+  padding: .5rem .9rem; border-radius: 999px; cursor: pointer;
+  background: var(--glass-soft); color: var(--text); border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  font-weight: 600; font-size: .875rem; transition: border-color .2s;
+}
+.theme-toggle:hover { border-color: var(--accent); }
+.theme-toggle .i-sun { display: none; }
+[data-theme="light"] .theme-toggle .i-sun { display: block; }
+[data-theme="light"] .theme-toggle .i-moon { display: none; }
+.theme-toggle svg { color: var(--accent-text); }
+
+/* 5. FORMS (high contrast) -------------------------------- */
+label, legend { color: var(--text); font-weight: 600; }
+.field {
+  background: var(--field-bg); color: var(--field-text);
+  border: 1.5px solid var(--field-line); border-radius: calc(var(--r) * .6);
+  caret-color: var(--accent); font-size: 1rem;
+}
+.field::placeholder { color: var(--field-ph); }
+.field:focus { outline: 3px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+.field:-webkit-autofill { -webkit-text-fill-color: var(--field-text); box-shadow: 0 0 0 40px var(--field-bg) inset; }
+.sl { color: var(--text); cursor: pointer; font-weight: 600; }
+.sl.on { background: var(--accent); color: var(--ink); border-color: var(--accent-stroke); }
+.err-text { color: #fb7185; font-weight: 600; }
+[data-theme="light"] .err-text { color: #be123c; }
+
+/* 6. MODALS ---------------------------------------------- */
+.scrim { background: rgba(2, 6, 23, .65); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
+.panel {
+  background: var(--surface); color: var(--text);
+  border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
+}
+.panel p, .panel li, .panel span { color: inherit; }
+.panel .muted { color: var(--muted); }
+.panel .accent { color: var(--accent-text); }
+.panel .btn { color: var(--ink); }
+.icon-btn { color: var(--muted); padding: .35rem; border-radius: 8px; cursor: pointer; background: transparent; border: 0; }
+.icon-btn:hover { color: var(--text); background: var(--raise); }
+.pop { animation: pop .22s ease-out; }
+@keyframes pop { from { opacity: 0; transform: translateY(8px) scale(.98); } to { opacity: 1; transform: none; } }
+
+/* Status badges */
+.badge { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .75rem; border-radius: 999px; font-size: .8rem; font-weight: 700; }
+.badge-free { background: var(--free-fill); border: 1px solid var(--free-stroke); color: var(--free-text); }
+.badge-occ  { background: var(--occ-fill);  border: 1px solid var(--occ-stroke);  color: var(--occ-text); }
+.badge-sel  { background: var(--accent); color: var(--ink); }
+
+/* 7. CHATBOT (frosted when open) -------------------------- */
+#chat {
+  background: var(--glass-chat);
+  -webkit-backdrop-filter: blur(20px) saturate(140%); backdrop-filter: blur(20px) saturate(140%);
+  border: 1px solid var(--line); color: var(--text);
+}
+#chat .btn { color: var(--ink); }
+.dot { display: inline-block; width: 6px; height: 6px; margin-right: 3px; border-radius: 50%; background: currentColor; animation: blink 1s infinite; }
+.dot:nth-child(2) { animation-delay: .15s; } .dot:nth-child(3) { animation-delay: .3s; }
+@keyframes blink { 0%, 80%, 100% { opacity: .25; } 40% { opacity: 1; } }
+
+/* 8. FLOOR PLAN: FREE / TAKEN / YOURS -------------------- */
+.zone { fill: rgba(255, 255, 255, .03); stroke: var(--line); stroke-dasharray: 5 5; }
+[data-theme="light"] .zone { fill: rgba(15, 23, 42, .03); }
+.u { transition: fill .15s, stroke .15s, filter .15s; cursor: pointer; outline: none; }
+.u.free {
+  fill: var(--free-fill); stroke: var(--free-stroke); stroke-width: 2;
+  filter: drop-shadow(0 0 4px var(--free-glow));
+}
+.u.free:hover, .u.free:focus-visible { fill: var(--free-stroke); fill-opacity: .55; filter: drop-shadow(0 0 8px var(--free-glow)); }
+.u.occ { fill: var(--occ-fill); stroke: var(--occ-stroke); stroke-width: 1; cursor: pointer; }
+.u.occ:hover, .u.occ:focus-visible { stroke: var(--text); }
 .u.sel {
-  fill: var(--accent-yellow) !important;
-  stroke: var(--accent-yellow-stroke) !important;
+  fill: #facc15; stroke: #eab308; stroke-width: 3;
+  filter: drop-shadow(0 0 10px rgba(250, 204, 21, .9));
 }
+.lbl { font-weight: 700; font-size: 12px; pointer-events: none; }
+.lbl-free { fill: var(--free-text); } .lbl-occ { fill: var(--occ-text); } .lbl-sel { fill: #0b132b; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 6px; vertical-align: -1px; }
+.sw-free { background: var(--free-fill); border: 2px solid var(--free-stroke); }
+.sw-occ  { background: var(--occ-fill);  border: 1px solid var(--occ-stroke); }
+.sw-sel  { background: #facc15; border: 1px solid #eab308; }
 
-/* Floating Chatbot Glassmorphism */
-#chat, [id*="chat"], .modal-overlay {
-  background: var(--card-bg) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid var(--card-border) !important;
-  color: var(--text-main);
-}
+/* 9. TOWER GRAPHIC --------------------------------------- */
+.tower-glass { fill: url(#glass); stroke: var(--bldg-frame); stroke-width: 1; }
+.tower-grid  { fill: url(#mull); }
+.tower-side  { fill: var(--bldg-side); stroke: var(--bldg-frame); stroke-width: .6; }
+.tower-sheen { fill: url(#sheen); pointer-events: none; }
+.band { fill: #facc15; filter: drop-shadow(0 0 5px rgba(250, 204, 21, .95)); transition: y .4s ease; }
+.tower-ground { stroke: var(--text); opacity: .25; }
+.tower-spire { stroke: var(--bldg-frame); stroke-width: 1.2; }
 
-/* =========================================================
-   4. REALISTIC 8F BUILDING GRAPHIC FIX
-   ========================================================= */
-.bldg-card svg, .bldg-card rect {
-  transition: all 0.3s ease;
-}
-
-/* Transforms former solid black rects into realistic glass & metallic building facades */
-svg rect[fill="#000"], 
-svg rect[fill="black"], 
-svg rect:not([fill]) {
-  fill: var(--bldg-glass) !important;
-  stroke: var(--bldg-frame) !important;
-  stroke-width: 1.5px;
-  rx: 3px;
-}
-
-/* Glowing Window Accent on the Building Graphic */
-svg rect:nth-child(2) {
-  fill: var(--bldg-light) !important;
-  filter: drop-shadow(0 0 6px var(--bldg-light));
-}
-
-/* =========================================================
-   5. HOVER 3D FLIP CARD EFFECT
-   ========================================================= */
-.preview-card {
-  perspective: 1000px;
-  cursor: pointer;
-}
+/* 10. 3D HOVER FLIP CARDS -------------------------------- */
+.preview-card { perspective: 1000px; cursor: pointer; height: 11rem; border-radius: var(--r); }
 .preview-card-inner {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  transition: transform 0.6s ease-in-out;
-  transform-style: preserve-3d;
+  position: relative; width: 100%; height: 100%;
+  transition: transform .6s ease-in-out; transform-style: preserve-3d;
 }
-.preview-card:hover .preview-card-inner {
-  transform: rotateY(180deg);
-}
+.preview-card:hover .preview-card-inner,
+.preview-card:focus-visible .preview-card-inner,
+.preview-card.flip .preview-card-inner { transform: rotateY(180deg); }
 .card-front, .card-back {
-  width: 100%;
-  height: 100%;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  border-radius: 16px;
+  position: absolute; inset: 0;
+  -webkit-backface-visibility: hidden; backface-visibility: hidden;
+  border-radius: var(--r); overflow: hidden;
 }
-.card-back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: rotateY(180deg);
-  background-size: cover;
-  background-position: center;
+.card-front {
+  background: var(--glass-soft); border: 1px solid var(--line);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; text-align: center; padding: 1rem;
 }
+.card-front .ico-lg { width: 2rem; height: 2rem; color: var(--accent-text); }
+.card-back { transform: rotateY(180deg); background-size: cover; background-position: center; border: 1px solid var(--line); }
+.card-back .cap {
+  position: absolute; left: 0; right: 0; bottom: 0; padding: 1.5rem .9rem .7rem;
+  background: linear-gradient(to top, rgba(2, 6, 23, .85), transparent);
+  color: #fff; font-weight: 700; font-size: .9rem;
+}
+
+/* 11. RESPONSIVE + MOTION -------------------------------- */
+@media (max-width: 640px) { .preview-card { height: 9.5rem; } }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+/* 12. CHAT TYPEAHEAD ------------------------------------ */
+#sug { max-height: 11rem; overflow-y: auto; margin: 0 .75rem .5rem; padding: .25rem;
+  background: var(--surface); border: 1px solid var(--line); border-radius: calc(var(--r) * .7); }
+.sug-item { display: block; width: 100%; text-align: left; padding: .5rem .7rem; font-size: .85rem;
+  color: var(--text); background: transparent; border: 0; border-radius: 8px; cursor: pointer; }
+.sug-item b { color: var(--accent-text); font-weight: 800; }
+.sug-item:hover, .sug-item.active { background: var(--raise); }
+.sug-item.active { outline: 2px solid var(--accent); outline-offset: -2px; }
+.sug-empty { padding: .6rem .7rem; font-size: .85rem; color: var(--muted); }

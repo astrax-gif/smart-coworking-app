@@ -1,34 +1,155 @@
-/* Custom variables & background */
+/* =========================================================
+   1. COLOR PALETTES & THEME VARIABLES
+   ========================================================= */
+
+/* Dark Theme (Default) */
+:root {
+  --bg-color: #0b132b;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --card-bg: rgba(15, 23, 42, 0.65);
+  --card-border: rgba(255, 255, 255, 0.15);
+  --header-bg: rgba(11, 19, 43, 0.8);
+  --accent-yellow: #facc15;
+  --accent-yellow-stroke: #eab308;
+  
+  /* HQ Night Background */
+  --bg-image: linear-gradient(to bottom, rgba(11, 19, 43, 0.82), rgba(15, 23, 42, 0.88)), 
+              url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1920&q=80');
+              
+  /* 8F Building Graphic Styling (Dark Mode) */
+  --bldg-glass: rgba(56, 189, 248, 0.25);
+  --bldg-frame: rgba(255, 255, 255, 0.2);
+  --bldg-light: #fef08a;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+  --bg-color: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --card-bg: rgba(255, 255, 255, 0.75);
+  --card-border: rgba(15, 23, 42, 0.12);
+  --header-bg: rgba(255, 255, 255, 0.85);
+  --accent-yellow: #eab308;
+  --accent-yellow-stroke: #ca8a04;
+  
+  /* HQ Daylight Background */
+  --bg-image: linear-gradient(to bottom, rgba(248, 250, 252, 0.7), rgba(241, 245, 249, 0.85)), 
+              url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80');
+
+  /* 8F Building Graphic Styling (Light Mode) */
+  --bldg-glass: rgba(14, 165, 233, 0.2);
+  --bldg-frame: rgba(15, 23, 42, 0.25);
+  --bldg-light: #f59e0b;
+}
+
+/* =========================================================
+   2. GENERAL & LAYOUT STYLES
+   ========================================================= */
 html, body {
   font-family: 'Manrope', system-ui, sans-serif;
-  color: var(--text);
-  background-image: linear-gradient(rgba(10, 23, 48, 0.75), rgba(10, 23, 48, 0.85)), 
-                    url('https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1920&q=80');
+  color: var(--text-main);
+  background: var(--bg-color);
+  background-image: var(--bg-image);
   background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  transition: background .4s, color .4s;
+  min-height: 100vh;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 
-/* Yellow booking selection color */
-.u.sel {
-  fill: #facc15 !important;
-  stroke: #eab308 !important;
+/* Header Glassmorphism */
+header {
+  background: var(--header-bg) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--card-border);
 }
 
-/* Semi-transparent & blurred floor plan container */
+/* Glassmorphism Cards & Panels */
 .card {
-  background: rgba(16, 33, 63, 0.45) !important;
+  background: var(--card-bg) !important;
   backdrop-filter: blur(16px) !important;
   -webkit-backdrop-filter: blur(16px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: 16px;
+  color: var(--text-main);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: background 0.4s ease, border-color 0.4s ease;
 }
 
-/* Semi-transparent chatbot window */
-#chat, [id*="chat"] {
-  background: rgba(16, 33, 63, 0.75) !important;
+/* =========================================================
+   3. BOOKING SELECTION (YELLOW) & CHATBOT
+   ========================================================= */
+/* Desk Booking Selection Color */
+.u.sel {
+  fill: var(--accent-yellow) !important;
+  stroke: var(--accent-yellow-stroke) !important;
+}
+
+/* Floating Chatbot Glassmorphism */
+#chat, [id*="chat"], .modal-overlay {
+  background: var(--card-bg) !important;
   backdrop-filter: blur(20px) !important;
   -webkit-backdrop-filter: blur(20px) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid var(--card-border) !important;
+  color: var(--text-main);
+}
+
+/* =========================================================
+   4. REALISTIC 8F BUILDING GRAPHIC FIX
+   ========================================================= */
+.bldg-card svg, .bldg-card rect {
+  transition: all 0.3s ease;
+}
+
+/* Transforms former solid black rects into realistic glass & metallic building facades */
+svg rect[fill="#000"], 
+svg rect[fill="black"], 
+svg rect:not([fill]) {
+  fill: var(--bldg-glass) !important;
+  stroke: var(--bldg-frame) !important;
+  stroke-width: 1.5px;
+  rx: 3px;
+}
+
+/* Glowing Window Accent on the Building Graphic */
+svg rect:nth-child(2) {
+  fill: var(--bldg-light) !important;
+  filter: drop-shadow(0 0 6px var(--bldg-light));
+}
+
+/* =========================================================
+   5. HOVER 3D FLIP CARD EFFECT
+   ========================================================= */
+.preview-card {
+  perspective: 1000px;
+  cursor: pointer;
+}
+.preview-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.6s ease-in-out;
+  transform-style: preserve-3d;
+}
+.preview-card:hover .preview-card-inner {
+  transform: rotateY(180deg);
+}
+.card-front, .card-back {
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: 16px;
+}
+.card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: rotateY(180deg);
+  background-size: cover;
+  background-position: center;
 }

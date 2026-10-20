@@ -7,6 +7,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
+  /* 1. Set Selected / Yours Desk Color to Yellow */
+.u.sel {
+  fill: #facc15 !important;
+  stroke: #eab308 !important;
+}
+
+/* 2. Set Full Page 2x Background Image */
+html, body {
+  background-image: url('assets/bg-2x.jpg'); /* Replace with your image path */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+}
+
+/* 3. Make Header Blurred & Semi-Transparent */
+header {
+  background: rgba(10, 23, 48, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
   :root { --bg:#0a1730; --surface:#10213f; --raise:#17294b; --line:#2a406a; --text:#eef2fa; --muted:#98a6c2; --accent:#d4a84b; --ink:#171103; --r:18px; --fh:'Sora',sans-serif; --hw:600; }
   [data-brand="maktabi"] { --bg:#22090f; --surface:#32111b; --raise:#431a27; --line:#6a2d3d; --text:#fcf1f1; --muted:#cba5ab; --accent:#e84a5f; --ink:#fff; --r:3px; --fh:'Cormorant Garamond',serif; --hw:700; }
   html, body { font-family:'Manrope',system-ui,sans-serif; color:var(--text); background:radial-gradient(900px 420px at 85% -8%, color-mix(in srgb,var(--accent) 20%,transparent), transparent), var(--bg); background-attachment:fixed; transition:background .4s,color .4s; }

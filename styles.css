@@ -48,52 +48,56 @@
   --bldg-frame: rgba(255, 255, 255, 0.28);
   --bldg-side: rgba(148, 163, 184, 0.3);
 
-  /* Page background: overlay + photo. Layers load in order: your own file in /images,
+  /* Dark mode only: overlay + photo. Layers load in order: your own file in /images,
      then an online photo of the tower, then a generic skyline. First one that loads wins. */
   --bg-base: #0b132b;
   --bg-overlay: rgba(11, 19, 43, 0.85);
+  --shadow: 0 10px 30px rgba(0, 0, 0, .18);
+  --bg-wash: linear-gradient(var(--bg-overlay), var(--bg-overlay));
   --bg-photo: url('images/hq-tower-night.jpg'),
     url('https://www.dubai-online.com/wp-content/uploads/2019/10/ss_1077576197.jpg'),
     url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1920&q=80');
 }
 
+/* LIGHT: clean ivory paper + charcoal ink + HQ yellow. No photo (the photo made it look washed out). */
 [data-theme="light"] {
   color-scheme: light;
-  --accent-text: #a16207;       /* yellow is unreadable as text on white */
-  --text: #0f172a;
-  --muted: #475569;
+  --accent-text: #8a5a00;       /* yellow is unreadable as text on white */
+  --text: #14181f;
+  --muted: #566070;
 
-  --glass: rgba(255, 255, 255, 0.6);
-  --glass-soft: rgba(255, 255, 255, 0.72);
-  --glass-chat: rgba(255, 255, 255, 0.7);
+  --glass: rgba(255, 255, 255, 0.9);
+  --glass-soft: #ffffff;
+  --glass-chat: rgba(255, 255, 255, 0.92);
   --surface: #ffffff;
-  --raise: rgba(15, 23, 42, 0.05);
-  --line: rgba(15, 23, 42, 0.18);
+  --raise: rgba(20, 24, 31, 0.045);
+  --line: rgba(20, 24, 31, 0.13);
+  --shadow: 0 1px 2px rgba(20, 24, 31, .06), 0 10px 30px rgba(20, 24, 31, .08);
 
   --field-bg: #ffffff;
-  --field-text: #0f172a;
-  --field-ph: #64748b;
-  --field-line: rgba(15, 23, 42, 0.4);
+  --field-text: #14181f;
+  --field-ph: #6b7686;
+  --field-line: rgba(20, 24, 31, 0.4);
 
-  --free-fill: rgba(16, 185, 129, 0.22);
+  --free-fill: rgba(16, 185, 129, 0.2);
   --free-stroke: #059669;
-  --free-glow: rgba(5, 150, 105, 0.55);
+  --free-glow: rgba(5, 150, 105, 0.45);
   --free-text: #065f46;
-  --occ-fill: rgba(100, 116, 139, 0.26);
-  --occ-stroke: rgba(71, 85, 105, 0.4);
-  --occ-text: #475569;
+  --occ-fill: #e5e9ef;
+  --occ-stroke: #c3cad5;
+  --occ-text: #6b7686;
 
-  --glass-a: rgba(186, 230, 253, 0.9);
-  --glass-b: rgba(56, 148, 210, 0.7);
-  --glass-c: rgba(30, 80, 140, 0.85);
-  --bldg-frame: rgba(255, 255, 255, 0.55);
-  --bldg-side: rgba(71, 85, 105, 0.3);
+  --glass-a: #bfdbfe;
+  --glass-b: #60a5fa;
+  --glass-c: #1e3a8a;
+  --bldg-frame: rgba(255, 255, 255, 0.7);
+  --bldg-side: rgba(100, 116, 139, 0.35);
 
-  --bg-base: #f8fafc;
-  --bg-overlay: rgba(248, 250, 252, 0.85);
-  --bg-photo: url('images/hq-tower-day.jpg'),
-    url('https://www.dubai-online.com/wp-content/uploads/2019/10/ss_1077576197.jpg'),
-    url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1920&q=80');
+  --bg-base: #f7f5ee;
+  --bg-photo: none;
+  --bg-wash: radial-gradient(900px 480px at 88% -6%, rgba(250, 204, 21, .22), transparent 60%),
+             radial-gradient(700px 420px at -5% 20%, rgba(96, 165, 250, .10), transparent 60%),
+             linear-gradient(180deg, #fffef9 0%, #f5f2e8 100%);
 }
 
 /* 2. PAGE + THEMED HQ BACKGROUND -------------------------- */
@@ -115,8 +119,7 @@ body::before {                       /* photo (changes with theme) */
 }
 body::after {                        /* soft gradient overlay */
   z-index: -1;
-  background: linear-gradient(to bottom, var(--bg-overlay), var(--bg-overlay));
-  transition: background .4s ease;
+  background: var(--bg-wash);
 }
 body.swap::before { opacity: 0; }    /* JS sets this briefly during toggle */
 
@@ -132,7 +135,7 @@ body.swap::before { opacity: 0; }    /* JS sets this briefly during toggle */
   border: 1px solid var(--line);
   border-radius: var(--r);
   color: var(--text);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+  box-shadow: var(--shadow);
   transition: background .4s ease, border-color .4s ease;
 }
 /* Booking panel ("8th Floor Plan") */
@@ -298,3 +301,31 @@ label, legend { color: var(--text); font-weight: 600; }
 .sug-item:hover, .sug-item.active { background: var(--raise); }
 .sug-item.active { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sug-empty { padding: .6rem .7rem; font-size: .85rem; color: var(--muted); }
+
+/* 13. SEAT HOVER: lift + flip-in preview card ------------- */
+.u { transform-box: fill-box; transform-origin: center; }
+.u:hover, .u:focus-visible { transform: scale(1.08); }
+.tip { position: fixed; z-index: 60; width: 230px; pointer-events: none; perspective: 700px; }
+.tip-card { background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .35); overflow: hidden; }
+.tip-photo { height: 104px; background-size: cover; background-position: center; display: flex; align-items: flex-start; justify-content: flex-end; padding: .5rem; }
+.tip-in .tip-card { animation: tipFlip .35s ease-out; transform-origin: 50% 100%; }
+@keyframes tipFlip { from { opacity: 0; transform: rotateX(-70deg) translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* 14. PREFERENCE CHIPS + DETAIL PAGE ---------------------- */
+.opt { position: relative; display: inline-flex; cursor: pointer; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt span { display: inline-flex; align-items: center; gap: .4rem; padding: .5rem .85rem; border-radius: 999px;
+  border: 1.5px solid var(--line); background: var(--raise); color: var(--text); font-weight: 600; font-size: .875rem; transition: background .15s, border-color .15s; }
+.opt:hover span { border-color: var(--accent-stroke); }
+.opt input:checked + span { background: var(--accent); color: var(--ink); border-color: var(--accent-stroke); }
+.opt input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.hero-photo { min-height: 18rem; background-size: cover; background-position: center; border-radius: var(--r); position: relative; overflow: hidden; border: 1px solid var(--line); }
+.hero-photo::after { content: ""; position: absolute; inset: 0; background: linear-gradient(to top, rgba(2, 6, 23, .55), transparent 55%); }
+.hero-photo .badge { position: absolute; top: 1rem; left: 1rem; z-index: 1; }
+.back-link { display: inline-flex; align-items: center; gap: .4rem; font-weight: 700; color: var(--text); text-decoration: none; padding: .5rem .9rem; border-radius: 999px; background: var(--glass-soft); border: 1px solid var(--line); }
+.back-link:hover { border-color: var(--accent); }
+a.sib { display: inline-block; padding: .4rem .8rem; border-radius: 999px; font-weight: 700; font-size: .85rem; color: var(--text); background: var(--raise); border: 1px solid var(--line); text-decoration: none; }
+a.sib:hover { border-color: var(--free-stroke); color: var(--free-text); }
+
+.tip.hidden, #sug.hidden { display: none; }

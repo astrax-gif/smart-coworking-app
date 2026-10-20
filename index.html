@@ -4,22 +4,28 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Tenant Portal · Sheikh Rashid Tower, DWTC</title>
-  <link rel="stylesheet" href="styles.css">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet"> 
+<script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen antialiased" data-brand="hq">
 
 <header class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
   <div class="flex items-center gap-3">
-    <div id="logo" class="fh w-11 h-11 flex items-center justify-center text-xl btn overflow-hidden" aria-hidden="true">
-      <span id="logoTxt">HQ</span>
-    </div>
-    <div><h1 id="bName" class="fh text-xl leading-tight">HQ Coworking</h1><p id="bSub" class="text-xs muted"></p></div>
+    <div id="logo" class="fh w-11 h-11 flex items-center justify-center text-xl btn overflow-hidden" aria-hidden="true"><span id="logoTxt">HQ</span></div>
+    <div><h1 id="bName" class="fh text-2xl leading-tight">HQ Coworking</h1><p id="bSub" class="text-xs muted"></p></div>
   </div>
-  <div class="card !rounded-full p-1 flex text-sm" role="group" aria-label="Switch workspace">
-    <button data-b="hq" class="bb px-4 py-1.5 rounded-full font-semibold">HQ</button>
-    <button data-b="maktabi" class="bb px-4 py-1.5 rounded-full font-semibold">Maktabi</button>
+  <div class="flex items-center gap-3">
+    <div class="card !rounded-full p-1 flex text-sm" role="group" aria-label="Switch workspace">
+      <button data-b="hq" class="bb px-4 py-1.5 rounded-full font-semibold">HQ</button>
+      <button data-b="maktabi" class="bb px-4 py-1.5 rounded-full font-semibold">Maktabi</button>
+    </div>
+    <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light theme">
+      <svg class="ico i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      <svg class="ico i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+      <span id="theme-label">Dark</span>
+    </button>
   </div>
 </header>
 
@@ -32,12 +38,28 @@
       <div id="chips" class="flex flex-wrap gap-2 mt-6 text-sm"></div>
     </div>
     <div class="md:col-span-2 card p-4 flex items-end justify-center gap-4">
-      <svg viewBox="0 0 220 250" class="w-44 sm:w-52" role="img" aria-label="Tower with the workspace floor highlighted">
-        <defs><pattern id="w" width="9" height="6" patternUnits="userSpaceOnUse"><rect class="win" x="2" y="1.5" width="5" height="3"/></pattern></defs>
-        <rect class="tw" x="8" y="170" width="44" height="70"/><rect class="tw" x="168" y="150" width="44" height="90"/>
-        <rect class="tw" x="64" y="10" width="92" height="230"/><rect x="64" y="10" width="92" height="230" fill="url(#w)"/>
-        <rect id="band" class="band" x="60" width="100" height="7"/><text id="bandT" x="168" font-size="11" class="accent" fill="currentColor" font-weight="700"></text>
-        <rect x="0" y="240" width="220" height="2" fill="currentColor" opacity=".2"/>
+      <svg viewBox="0 0 220 260" class="w-44 sm:w-52" role="img" aria-label="Sheikh Rashid Tower, 39 floors, with the workspace floor highlighted">
+        <defs>
+          <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" style="stop-color:var(--glass-a)"/><stop offset=".5" style="stop-color:var(--glass-b)"/><stop offset="1" style="stop-color:var(--glass-c)"/>
+          </linearGradient>
+          <linearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset=".3" stop-color="#fff" stop-opacity=".35"/><stop offset=".5" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#fff" stop-opacity="0"/>
+          </linearGradient>
+          <!-- one tile = one floor (5.8 units), anchored to the ground line -->
+          <pattern id="mull" width="9.5" height="5.8" y="240" patternUnits="userSpaceOnUse">
+            <rect width="9.5" height=".55" style="fill:var(--bldg-frame)"/><rect width=".45" height="5.8" style="fill:var(--bldg-frame)"/>
+          </pattern>
+        </defs>
+        <rect class="tower-side" x="12" y="176" width="40" height="64"/><rect class="tower-side" x="168" y="150" width="40" height="90"/>
+        <rect class="tower-grid" x="12" y="176" width="40" height="64"/><rect class="tower-grid" x="168" y="150" width="40" height="90"/>
+        <line class="tower-spire" x1="110" y1="0" x2="110" y2="14"/>
+        <path class="tower-glass" d="M70 240V32l9-18h62l9 18v208Z"/>
+        <path class="tower-grid" d="M70 240V32l9-18h62l9 18v208Z"/>
+        <path class="tower-sheen" d="M70 240V32l9-18h62l9 18v208Z"/>
+        <rect id="band" class="band" x="66" width="88" height="5.8" rx="1"/>
+        <text id="bandT" x="160" font-size="11" class="accent" fill="currentColor" font-weight="700"></text>
+        <line class="tower-ground" x1="0" y1="240.5" x2="220" y2="240.5" stroke-width="2"/>
       </svg>
       <div class="pb-2"><p id="floorBig" class="fh text-5xl accent"></p><p class="text-xs muted">of 39 floors<br>Sheikh Rashid Tower</p></div>
     </div>
@@ -45,67 +67,88 @@
 
   <div class="grid lg:grid-cols-3 gap-6">
     <!-- Floor plan -->
-    <section class="lg:col-span-2 card p-5 sm:p-6">
+    <section class="lg:col-span-2 card glass-panel p-5 sm:p-6">
       <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
-        <h3 id="planT" class="fh text-2xl"></h3>
-        <div class="flex gap-4 text-xs muted"><span><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1 bg-emerald-400/60"></i>Free</span><span><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1" style="background:var(--line)"></i>Taken</span><span><i class="inline-block w-2.5 h-2.5 rounded-sm mr-1" style="background:var(--accent)"></i>Yours</span></div>
+        <h3 id="planT" class="fh text-3xl"></h3>
+        <div class="flex gap-4 text-xs font-semibold"><span><i class="sw sw-free"></i>Free</span><span><i class="sw sw-occ"></i>Taken</span><span><i class="sw sw-sel"></i>Yours</span></div>
       </div>
       <svg id="plan" class="w-full" role="group" aria-label="Floor plan"></svg>
       <div class="raise mt-4 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div><p id="sumT" class="font-semibold">Tap a free space on the plan</p><p id="sumS" class="text-sm muted">Desks, offices and rooms are all selectable.</p></div>
-        <button id="confirmBtn" disabled class="btn font-bold px-6 py-3 transition shrink-0">Confirm Booking</button>
+        <div><p id="sumT" class="font-semibold">Select a free space on the plan</p><p id="sumS" class="text-sm muted">Desks, offices and rooms are all selectable.</p></div>
+        <button id="confirmBtn" disabled class="btn px-6 py-3 transition shrink-0">Confirm booking</button>
       </div>
 
-      <!-- Photo Gallery Section -->
       <div class="mt-8 border-t pt-6" style="border-color:var(--line)">
-        <h4 class="fh text-xl mb-4">Workspace Preview</h4>
+        <h4 class="fh text-2xl mb-1">Workspace preview</h4>
+        <p class="text-xs muted mb-4">Hover a card to flip it and see the space.</p>
         <div id="gallery" class="grid sm:grid-cols-3 gap-3"></div>
       </div>
     </section>
 
     <aside class="space-y-6">
-      <div class="card p-5"><h3 class="fh text-xl mb-3">Today on this floor</h3><div id="stats" class="grid grid-cols-3 gap-2 text-center"></div></div>
-      <div class="card p-5"><h3 class="fh text-xl mb-3">Included for members</h3><ul id="perks" class="space-y-2 text-sm"></ul></div>
-      <div class="card p-5"><h3 class="fh text-xl mb-1">Community board</h3><p class="text-xs muted mb-3">Sample notices for the demo</p><ul id="board" class="space-y-2 text-sm"></ul>
-        <button id="reportBtn" class="w-full mt-4 border py-2.5 text-sm font-semibold hover:brightness-125 transition" style="border-color:var(--accent);color:var(--accent);border-radius:calc(var(--r)*.7)">Report a facility issue</button></div>
+      <div class="card p-5"><h3 class="fh text-2xl mb-3">Today on this floor</h3><div id="stats" class="grid grid-cols-3 gap-2 text-center"></div></div>
+      <div class="card p-5"><h3 class="fh text-2xl mb-3">Included for members</h3><ul id="perks" class="space-y-2 text-sm"></ul></div>
+      <div class="card p-5"><h3 class="fh text-2xl mb-1">Community board</h3><p class="text-xs muted mb-3">Sample notices for the demo</p><ul id="board" class="space-y-2 text-sm"></ul>
+        <button id="reportBtn" class="w-full mt-4 border py-2.5 text-sm font-semibold hover:brightness-125 transition accent" style="border-color:var(--accent);border-radius:calc(var(--r)*.7)">Report a facility issue</button></div>
     </aside>
   </div>
   <p class="text-xs muted mt-8 max-w-3xl">Prototype. Floor, desk counts and opening hours come from public listings and should be confirmed with each operator. Availability and prices on this page are simulated. Logos are placeholders, not the official marks.</p>
 </main>
 
-<button id="fab" class="fixed bottom-5 right-5 btn font-bold pl-4 pr-5 py-3 !rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transition">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.4A8 8 0 1 1 21 12z"/></svg>Ask support</button>
+<button id="fab" class="fixed bottom-5 right-5 btn pl-4 pr-5 py-3 !rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transition">
+  <svg class="ico" style="width:20px;height:20px" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 20l1-4.4A8 8 0 1 1 21 12z"/></svg>Ask support</button>
 
-<section id="chat" class="hidden fixed bottom-5 right-5 left-5 sm:left-auto sm:w-96 h-[32rem] max-h-[85vh] card shadow-2xl flex-col overflow-hidden pop !bg-[var(--surface)]" role="dialog" aria-label="Support assistant">
+<section id="chat" class="hidden fixed bottom-5 right-5 left-5 sm:left-auto sm:w-96 h-[32rem] max-h-[85vh] card shadow-2xl flex-col overflow-hidden pop" role="dialog" aria-label="Support assistant">
   <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color:var(--line)">
     <div class="flex items-center gap-2"><div id="bLogo" class="fh w-8 h-8 btn flex items-center justify-center"></div><div><p id="bot" class="text-sm font-bold leading-tight"></p><p class="text-xs muted">Replies instantly · demo bot</p></div></div>
-    <button id="cClose" class="muted p-1" aria-label="Close chat">✕</button>
+    <button id="cClose" class="icon-btn" aria-label="Close chat" data-ic="x"></button>
   </div>
   <div id="msgs" class="flex-1 overflow-y-auto p-4 space-y-3 text-sm whitespace-pre-line" aria-live="polite"></div>
   <div id="quick" class="px-4 pb-2 flex flex-wrap gap-2"></div>
+  <div id="sug" class="hidden" role="listbox" aria-label="Suggested questions"></div>
   <form id="cForm" class="p-3 border-t flex gap-2" style="border-color:var(--line)">
-    <input id="cIn" class="field flex-1 px-3 py-2 text-sm" placeholder="Type a message" autocomplete="off" aria-label="Message"/><button class="btn px-4 text-sm font-bold">Send</button>
+    <input id="cIn" class="field flex-1 px-3 py-2 text-sm" placeholder="Type a letter or a question…" autocomplete="off" aria-autocomplete="list" aria-controls="sug" aria-label="Message"/><button class="btn px-4 text-sm">Send</button>
   </form>
 </section>
 
-<div id="modal" class="hidden fixed inset-0 z-50 items-center justify-center p-4 bg-black/60" role="dialog" aria-modal="true" aria-labelledby="mT">
-  <div class="card !bg-[var(--surface)] w-full max-w-md p-6 pop max-h-[92vh] overflow-y-auto">
+<!-- Seat detail modal -->
+<div id="seatModal" class="scrim hidden fixed inset-0 z-50 items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="sT">
+  <div class="panel w-full max-w-md p-6 pop max-h-[92vh] overflow-y-auto">
+    <div class="flex justify-between items-start gap-3">
+      <div><h3 id="sT" class="fh text-3xl leading-none"></h3><p id="sK" class="text-sm muted mt-1"></p></div>
+      <button class="icon-btn xs" aria-label="Close" data-ic="x"></button>
+    </div>
+    <div class="flex flex-wrap items-center gap-2 mt-4"><span id="sB" class="badge"></span><span id="sMeta" class="text-sm muted flex items-center gap-1"></span></div>
+    <p id="sR" class="text-sm mt-4 font-semibold"></p>
+    <h4 class="text-sm font-bold mt-5 mb-2">Amenities</h4>
+    <ul id="sA" class="grid grid-cols-2 gap-2 text-sm"></ul>
+    <p id="sNote" class="hidden raise p-3 mt-5 text-sm">This space is already booked. Choose a green space on the plan.</p>
+    <div class="flex gap-2 mt-6">
+      <button id="sBook" class="btn flex-1 py-3">Book this space</button>
+      <button class="xs raise flex-1 py-3 font-semibold">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Booking modal -->
+<div id="modal" class="scrim hidden fixed inset-0 z-50 items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="mT">
+  <div class="panel w-full max-w-md p-6 pop max-h-[92vh] overflow-y-auto">
     <div id="fView">
-      <div class="flex justify-between items-start"><h3 id="mT" class="fh text-2xl">Book your space</h3><button class="xm muted p-1" aria-label="Close">✕</button></div>
-      <p id="mS" class="text-sm accent mb-5"></p>
+      <div class="flex justify-between items-start"><h3 id="mT" class="fh text-3xl">Book your space</h3><button class="icon-btn xm" aria-label="Close" data-ic="x"></button></div>
+      <p id="mS" class="text-sm font-semibold accent mb-5"></p>
       <form id="bForm" class="space-y-4" novalidate>
         <label class="block text-sm">Full name<input id="fN" class="field w-full mt-1 px-3 py-2.5" autocomplete="name"/></label>
         <label class="block text-sm">Email<input id="fE" type="email" class="field w-full mt-1 px-3 py-2.5" autocomplete="email"/></label>
         <fieldset><legend class="text-sm mb-1">Preferred time slot</legend><div id="slots" class="grid grid-cols-2 gap-2"></div></fieldset>
-        <p id="err" class="text-sm text-rose-400 hidden"></p>
-        <button class="btn w-full font-bold py-3 transition">Reserve now</button>
+        <p id="err" class="text-sm err-text hidden" role="alert"></p>
+        <button class="btn w-full py-3 transition">Reserve now</button>
       </form>
     </div>
     <div id="dView" class="hidden text-center">
-      <div class="w-14 h-14 rounded-full btn mx-auto flex items-center justify-center text-2xl mb-4">✓</div>
-      <h3 class="fh text-2xl">You're booked in</h3><p id="dT" class="muted text-sm mt-2"></p>
+      <div class="w-14 h-14 rounded-full btn mx-auto flex items-center justify-center mb-4"><svg class="ico" style="width:28px;height:28px;stroke-width:3" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
+      <h3 class="fh text-3xl">You're booked in</h3><p id="dT" class="muted text-sm mt-2"></p>
       <div id="dC" class="raise p-4 mt-5 text-left text-sm space-y-1.5"></div>
-      <button class="xm btn w-full font-bold py-3 mt-5">Done</button>
+      <button class="xm btn w-full py-3 mt-5">Done</button>
     </div>
   </div>
 </div>
@@ -114,29 +157,52 @@
 const B = {
   hq: { name:'HQ Coworking', mono:'HQ', sub:'Sheikh Rashid Tower · Trade Centre 2', floor:8, hours:'Mon–Fri 08:30–18:00 · members 24/7', addr:'8th Floor, Sheikh Rashid Tower, Sheikh Zayed Road, DWTC', seed:7,
     title:'Creative working environments, eight floors above the Trade Centre.', text:'Flexi desks, private desks and meeting spaces with staffed reception on weekdays and round-the-clock access for members.',
-    chips:['📍 DWTC, Sheikh Zayed Rd','🕗 Mon–Fri 08:30–18:00','🔑 24/7 for members'], plan:'8th floor plan', botName:'HQ Concierge',
+    chips:[['pin','DWTC, Sheikh Zayed Rd'],['clock','Mon–Fri 08:30–18:00'],['key','24/7 for members']], plan:'8th floor plan', botName:'HQ Concierge',
     perks:['26 flexi desks and 32 private desks','2 meeting spaces','Phone booths and admin support','Direct access to DWTC exhibitions'],
-    board:['🤝 Members’ coffee morning, Thursday','🎪 Exhibition week: book desks early','📦 Parcel pickup now at reception'],
+    board:[['coffee','Members’ coffee morning, Thursday'],['users','Exhibition week: book desks early'],['package','Parcel pickup now at reception']],
     kinds:{flex:['Flexi desk','Rate confirmed by the HQ team'],priv:['Private suite · 4 desks','Rate confirmed by the HQ team'],room:['Meeting space','Rate confirmed by the HQ team']}, wifi:'HQ-Members',
     photos: [
-      { title: 'Flexi Desk Area', url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80' },
-      { title: 'Private Offices', url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=600&q=80' },
-      { title: 'Meeting Room', url: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?auto=format&fit=crop&w=600&q=80' }
+      { ico:'desk', title: 'Flexi Desk Area', url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80' },
+      { ico:'door', title: 'Private Offices', url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=600&q=80' },
+      { ico:'video', title: 'Meeting Room', url: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?auto=format&fit=crop&w=600&q=80' }
     ]
   },
   maktabi: { name:'Maktabi Business Centre', mono:'M', sub:'Sheikh Rashid Tower · Trade Centre 2', floor:18, hours:'Mon–Fri 09:00–18:00', addr:'18th Floor, Sheikh Rashid Tower, Sheikh Zayed Road, DWTC', seed:21,
     title:'Designed for your success, on the 18th floor.', text:'Over 100 flexible desks, 30 private offices, two meeting rooms and an event space, with parking and a prestigious DWTC business address.',
-    chips:['📍 DWTC, Sheikh Zayed Rd','🕘 Mon–Fri 09:00–18:00','🚗 Parking on site'], plan:'18th floor plan', botName:'Maktabi Concierge',
+    chips:[['pin','DWTC, Sheikh Zayed Rd'],['clock','Mon–Fri 09:00–18:00'],['car','Parking on site']], plan:'18th floor plan', botName:'Maktabi Concierge',
     perks:['100+ flexible desks, 30 private offices','Unlimited coffee and tea','Business address and mail management','Printing credits and event access'],
-    board:['🥐 Members’ breakfast, first Monday','💼 Workshop: setting up in the free zone','🎤 Event space open for member bookings'],
+    board:[['coffee','Members’ breakfast, first Monday'],['briefcase','Workshop: setting up in the free zone'],['mic','Event space open for member bookings']],
     kinds:{flex:['Flexible desk','From AED 16.50 / hour (listed rate)'],priv:['Private office','Rate confirmed by the Maktabi team'],room:['Meeting room','Rate confirmed by the Maktabi team'],event:['Event space','Rate confirmed by the Maktabi team']}, wifi:'Maktabi-Guest',
     photos: [
-      { title: 'Executive Suites', url: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=600&q=80' },
-      { title: 'Event Space', url: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=600&q=80' },
-      { title: 'Lounge & Coffee Bar', url: 'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=600&q=80' }
+      { ico:'door', title: 'Executive Suites', url: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=600&q=80' },
+      { ico:'mic', title: 'Event Space', url: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=600&q=80' },
+      { ico:'coffee', title: 'Lounge & Coffee Bar', url: 'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=600&q=80' }
     ]
   }
 };
+const ICONS = {
+  pin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+  key:'<circle cx="8" cy="15" r="4"/><path d="m10.8 12.2 9.2-9.2M16 7l3 3M14 9l2 2"/>',
+  car:'<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  package:'<path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5M12 22V12"/>',
+  coffee:'<path d="M10 2v2M14 2v2M6 2v2"/><path d="M16 8h1a4 4 0 0 1 0 8h-1M3 8h13v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"/>',
+  briefcase:'<rect width="20" height="14" x="2" y="7" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>',
+  mic:'<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  wifi:'<path d="M5 12.55a11 11 0 0 1 14.08 0M1.42 9a16 16 0 0 1 21.16 0M8.53 16.11a6 6 0 0 1 6.95 0M12 20h.01"/>',
+  monitor:'<rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  plug:'<path d="M12 22v-5M9 8V2M15 8V2M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/>',
+  wind:'<path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2M9.6 4.6A2 2 0 1 1 11 8H2M12.6 19.4A2 2 0 1 0 14 16H2"/>',
+  lock:'<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  video:'<path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+  desk:'<rect width="18" height="12" x="3" y="3" rx="2"/><path d="M8 21h8M12 15v6"/>',
+  door:'<path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14M2 20h20M14 12v.01"/>'
+};
+const ic = n => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
+const hydrate = () => document.querySelectorAll('[data-ic]').forEach(el => el.innerHTML = ic(el.dataset.ic));
 const SLOTS = ['09:00 – 12:00','12:00 – 15:00','15:00 – 18:00','Full day'];
 const $ = s => document.querySelector(s);
 let brand = 'hq', items = [], picked = null, slot = SLOTS[0];
@@ -160,8 +226,10 @@ function drawPlan() {
   $('#plan').setAttribute('viewBox', `0 0 600 ${h}`);
   $('#plan').innerHTML = `<rect class="zone" x="4" y="4" width="592" height="${h - 8}" rx="8"/>` + items.map(u => {
     const cls = 'u ' + (u.id === picked ? 'sel' : u.free ? 'free' : 'occ'), k = d.kinds[u.kind][0];
-    const txt = u.w > 60 ? `<text x="${u.x + u.w / 2}" y="${u.y + u.h / 2 + 4}" text-anchor="middle" font-size="12" font-weight="700" fill="${u.id === picked ? 'var(--ink)' : 'currentColor'}" pointer-events="none">${u.label}</text>` : '';
-    return `<rect class="${cls}" data-id="${u.id}" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.h}" rx="4" ${u.free ? 'tabindex="0" role="button"' : ''} aria-label="${u.label}, ${k}, ${u.free ? 'free' : 'taken'}"><title>${u.label} · ${k} · ${u.free ? 'free' : 'taken'}</title></rect>${txt}`;
+    
+    const lc = u.id === picked ? 'lbl-sel' : u.free ? 'lbl-free' : 'lbl-occ';
+    const txt = u.w > 60 ? `<text class="lbl ${lc}" x="${u.x + u.w / 2}" y="${u.y + u.h / 2 + 4}" text-anchor="middle">${u.label}</text>` : '';
+    return `<rect class="${cls}" data-id="${u.id}" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.h}" rx="4" tabindex="0" role="button" aria-label="${u.label}, ${k}, ${u.free ? 'free' : 'taken'}"><title>${u.label} · ${k} · ${u.free ? 'free' : 'taken'}</title></rect>${txt}`;
   }).join('');
 }
 function stats() {
@@ -171,7 +239,7 @@ function stats() {
 }
 function summary() {
   const u = items.find(x => x.id === picked), d = B[brand];
-  $('#sumT').textContent = u ? `${u.label} · ${d.kinds[u.kind][0]}` : 'Tap a free space on the plan';
+  $('#sumT').textContent = u ? `${u.label} · ${d.kinds[u.kind][0]}` : 'Select a free space on the plan';
   $('#sumS').textContent = u ? d.kinds[u.kind][1] : 'Desks, offices and rooms are all selectable.';
   $('#confirmBtn').disabled = !u; drawPlan();
 }
@@ -180,33 +248,59 @@ function setBrand(b) {
   document.body.dataset.brand = b;
   $('#bName').textContent = d.name; $('#bSub').textContent = d.sub; $('#logoTxt').textContent = d.mono; $('#bLogo').textContent = d.mono; $('#bot').textContent = d.botName;
   $('#hTitle').textContent = d.title; $('#hText').textContent = d.text; $('#planT').textContent = d.plan; document.title = d.name + ' · Tenant Portal';
-  $('#chips').innerHTML = d.chips.map(c => `<span class="chip px-3 py-1.5">${c}</span>`).join('');
-  $('#perks').innerHTML = d.perks.map(p => `<li class="flex gap-2"><span class="accent">✓</span>${p}</li>`).join('');
-  $('#board').innerHTML = d.board.map(p => `<li class="raise p-3 muted">${p}</li>`).join('');
+  $('#chips').innerHTML = d.chips.map(([i, t]) => `<span class="chip px-3 py-1.5">${ic(i)}${t}</span>`).join('');
+  $('#perks').innerHTML = d.perks.map(p => `<li class="flex gap-2 items-start"><span class="accent mt-0.5">${ic('check')}</span>${p}</li>`).join('');
+  $('#board').innerHTML = d.board.map(p => `<li class="raise p-3 flex gap-3 items-start"><span class="accent mt-0.5">${ic(p[0])}</span><span>${p[1]}</span></li>`).join('');
   $('#gallery').innerHTML = d.photos.map(p => `
-    <div class="raise overflow-hidden group rounded-lg">
-      <img src="${p.url}" alt="${p.title}" class="w-full h-28 object-cover group-hover:scale-105 transition duration-300" />
-      <div class="p-2 text-xs font-semibold text-center muted">${p.title}</div>
-    </div>
-  `).join('');
-  const y = 247 - d.floor * 5.9; $('#band').setAttribute('y', y); $('#bandT').setAttribute('y', y + 7); $('#bandT').textContent = d.floor + 'F'; $('#floorBig').textContent = d.floor + 'F';
+    <div class="preview-card" tabindex="0" role="button" aria-label="${p.title}: flip to preview">
+      <div class="preview-card-inner">
+        <div class="card-front"><span class="ico-lg">${ic(p.ico).replace('class="ico"','class="ico ico-lg"')}</span><p class="font-bold">${p.title}</p><p class="text-xs muted">Hover to preview</p></div>
+        <div class="card-back" style="background-image:url('${p.url.replace('w=600','w=1400')}')"><span class="cap">${p.title}</span></div>
+      </div>
+    </div>`).join('');
+  const y = 240 - d.floor * 5.8; $('#band').setAttribute('y', y); $('#bandT').setAttribute('y', y + 5.5); $('#bandT').textContent = d.floor + 'F'; $('#floorBig').textContent = d.floor + 'F';
   document.querySelectorAll('.bb').forEach(el => { const on = el.dataset.b === b; el.classList.toggle('btn', on); el.classList.toggle('muted', !on); el.setAttribute('aria-pressed', on); });
-  stats(); summary(); resetChat();
+  stats(); summary(); resetChat(); hydrate();
 }
 document.querySelectorAll('.bb').forEach(el => el.addEventListener('click', () => setBrand(el.dataset.b)));
-const pick = e => { const t = e.target.closest('.u.free'); if (t) { picked = t.dataset.id; summary(); } };
+const pick = e => { const t = e.target.closest('.u'); if (t) openSeat(t.dataset.id); };
 $('#plan').addEventListener('click', pick);
 $('#plan').addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); pick(e); } });
+
+/* Seat detail modal */
+const AM = {
+  flex:[['desk','Ergonomic desk'],['wifi','Fibre Wi-Fi'],['plug','Power and USB-C'],['coffee','Coffee and tea']],
+  priv:[['lock','Lockable suite'],['desk','Furnished desks'],['wifi','Dedicated network'],['wind','Climate control']],
+  room:[['video','Display and video calls'],['users','Table seating'],['wifi','Fibre Wi-Fi'],['wind','Climate control']],
+  event:[['mic','AV and PA system'],['users','Flexible layout'],['wifi','Fibre Wi-Fi'],['coffee','Catering access']]
+};
+const openM = id => $(id).classList.replace('hidden', 'flex');
+const closeS = () => $('#seatModal').classList.replace('flex', 'hidden');
+function openSeat(id) {
+  const u = items.find(x => x.id === id), d = B[brand], k = d.kinds[u.kind], mine = u.id === picked;
+  if (u.free && !mine) { picked = id; summary(); }
+  $('#sT').textContent = u.label; $('#sK').textContent = k[0]; $('#sR').textContent = k[1];
+  $('#sB').className = 'badge ' + (u.free ? 'badge-free' : 'badge-occ');
+  $('#sB').innerHTML = u.free ? ic('check') + 'Free to book' : ic('lock') + 'Taken';
+  $('#sMeta').innerHTML = ic('pin') + d.floor + 'F, Sheikh Rashid Tower';
+  $('#sA').innerHTML = AM[u.kind].map(([i, t]) => `<li class="raise flex items-center gap-2 px-3 py-2"><span class="accent">${ic(i)}</span>${t}</li>`).join('');
+  $('#sBook').classList.toggle('hidden', !u.free); $('#sNote').classList.toggle('hidden', u.free);
+  openM('#seatModal'); (u.free ? $('#sBook') : $('#seatModal .xs')).focus();
+}
+document.querySelectorAll('.xs').forEach(b => b.addEventListener('click', closeS));
+$('#seatModal').addEventListener('click', e => { if (e.target.id === 'seatModal') closeS(); });
+$('#sBook').addEventListener('click', () => { closeS(); openBooking(); });
 
 /* Booking modal */
 const slotsUI = () => $('#slots').innerHTML = SLOTS.map(t => `<button type="button" data-t="${t}" aria-pressed="${t === slot}" class="sl raise border py-2 text-sm ${t === slot ? 'on' : ''}" style="border-color:var(--line)">${t}</button>`).join('');
 const closeM = () => $('#modal').classList.replace('flex', 'hidden');
-$('#confirmBtn').addEventListener('click', () => {
+function openBooking() {
   const u = items.find(x => x.id === picked); if (!u) return;
   $('#mS').textContent = `${u.label} · ${B[brand].kinds[u.kind][0]} · ${B[brand].name}`;
   $('#fView').classList.remove('hidden'); $('#dView').classList.add('hidden'); $('#err').classList.add('hidden'); slotsUI();
   $('#modal').classList.replace('hidden', 'flex'); $('#fN').focus();
-});
+}
+$('#confirmBtn').addEventListener('click', openBooking);
 document.querySelectorAll('.xm').forEach(b => b.addEventListener('click', closeM));
 $('#modal').addEventListener('click', e => { if (e.target.id === 'modal') closeM(); });
 $('#slots').addEventListener('click', e => { const b = e.target.closest('.sl'); if (b) { slot = b.dataset.t; slotsUI(); } });
@@ -227,10 +321,10 @@ $('#bForm').addEventListener('submit', e => {
 });
 
 /* Chat */
-const QUICK = ['Request Wi-Fi Pass', 'Book Meeting Room', 'Report Facility Issue', 'Opening hours'];
+const QUICK = ['Wi-Fi password', 'Book a meeting room', 'Facility issue: report', 'Opening hours'];
 const scr = () => { $('#msgs').scrollTop = $('#msgs').scrollHeight; };
 function msg(t, who) { const d = document.createElement('div'); d.className = `max-w-[85%] px-3 py-2 pop ${who === 'u' ? 'btn ml-auto' : 'raise'}`; d.textContent = t; $('#msgs').append(d); scr(); return d; }
-function reply(q) {
+function oldReply(q) {
   const t = q.toLowerCase(), d = B[brand], rooms = items.filter(u => u.kind === 'room' && u.free).map(u => u.label);
   if (/wi-?fi|password|internet/.test(t)) return `Network: ${d.wifi}\nPassword: demo-2026 (placeholder)\nA real build would issue a one-time code per member.`;
   if (/meeting|room|boardroom/.test(t)) return rooms.length ? `Free right now: ${rooms.join(', ')}. Tap one on the floor plan, then press Confirm Booking.` : 'All rooms are taken at the moment. Try another time slot.';
@@ -239,42 +333,136 @@ function reply(q) {
   if (/issue|broken|ac\b|aircon|light|clean|fix|facility|cold|hot|noisy/.test(t) && t.length > 22) return `Logged as ticket #${Math.floor(1000 + Math.random() * 9000)}. The community team has been notified.`;
   if (/issue|broken|facility/.test(t)) return 'Sorry about that. Tell me what and where, for example "AC too cold near desk F12".';
   if (/guest|visitor/.test(t)) return 'Send your guest\'s name and arrival time. A pass goes to reception before they arrive.';
-  return 'I can help with Wi-Fi, rooms, opening hours, guest passes and facility issues.';
+  return FALLBACK;
 }
+
+/* Chat knowledge base (42 questions). Answers can use the active workspace `d`. */
+const tk = () => Math.floor(1000 + Math.random() * 9000);
+const logT = d => `Logged as ticket #${tk()}. The ${d.name} community team has been notified.`;
+const QA = [
+ ['AC is too cold', d => logT(d) + '\nFacilities will adjust the zone temperature. Note your desk number next time for a faster fix.'],
+ ['AC is too hot', d => logT(d) + '\nFacilities will check the airflow for your area.'],
+ ['AC is not working near my desk', d => logT(d) + '\nPlease share your desk number, for example F12.'],
+ ['Access card is not working', d => 'Visit reception during opening hours (' + d.hours + ') and the team will re-activate your card.'],
+ ['Add a guest to my booking', () => 'Send your guest’s name and arrival time. A pass goes to reception before they arrive.'],
+ ['Address of this centre', d => d.addr + '.'],
+ ['Admin support: what is included?', () => 'Reception can help with printing, courier handover and visitor check-in. Extra services are confirmed with the team.'],
+ ['Book a meeting room', () => { const r = items.filter(u => u.kind === 'room' && u.free).map(u => u.label); return r.length ? `Free right now: ${r.join(', ')}. Select one on the floor plan, then press Confirm booking.` : 'All rooms are taken at the moment. Try another time slot.'; }],
+ ['Book a desk for tomorrow', () => 'Select a green desk on the plan, choose Book this space, then pick your time slot. This demo shows today’s availability.'],
+ ['Business address and mail', d => 'Members can use the ' + d.name + ' address for mail. A real build would list the mail-handling plan here.'],
+ ['Breakfast or coffee available?', () => 'Coffee and tea are available in the kitchen areas. There are also cafés near the tower.'],
+ ['Cancel my booking', () => 'Open your confirmation email and reply with the reference, or tell reception. This demo does not store cancellations yet.'],
+ ['Change my time slot', () => 'Book the new slot first, then ask reception to release the old one. A real build would offer Edit booking here.'],
+ ['Cleaning request', d => logT(d) + '\nHousekeeping will visit your area.'],
+ ['Community events this week', d => 'See the Community board on this page: ' + d.board.map(b => b[1]).join('; ') + '.'],
+ ['Coffee and tea included?', d => d.perks.find(p => /coffee/i.test(p)) ? 'Yes. ' + d.perks.find(p => /coffee/i.test(p)) + '.' : 'Tea and coffee are available in the shared kitchen areas.'],
+ ['Day pass: how does it work?', () => 'Pick a free desk, choose Full day as the time slot and reserve. Check in at reception on arrival.'],
+ ['Desk rates', d => d.kinds.flex[1] + '.'],
+ ['Does the centre have parking?', d => d.name.startsWith('Maktabi') ? 'Yes, parking is available on site.' : 'There is secure on-site parking in the tower. Ask reception about member access.'],
+ ['Do you have phone booths?', d => /phone/i.test(d.perks.join()) ? 'Yes, phone booths are included for members. They are first come, first served.' : 'Ask reception about quiet call spaces on this floor.'],
+ ['Event space booking', d => d.kinds.event ? 'Select Event space on the plan (E1) and confirm. The team will follow up with layout and AV options.' : 'Events are handled through the ' + d.name + ' team. Ask reception for options.'],
+ ['Exhibition week: any tips?', () => 'Book desks early and allow extra time to enter the building. Metro and DWTC traffic are busiest in the morning.'],
+ ['Facility issue: report', () => 'Tell me what and where, for example “AC too cold near desk F12”, and I will log a ticket.'],
+ ['Free or taken: how do I read the plan?', () => 'Green outline is free, grey is taken and yellow is the space you selected. Select any space to see its details.'],
+ ['Guest pass', () => 'Send your guest’s name and arrival time. A pass goes to reception before they arrive.'],
+ ['How do I get 24/7 access?', d => d.hours + '.'],
+ ['How do I get here by metro?', () => 'Take the Red Line to World Trade Centre station. The tower is a short walk away on Sheikh Zayed Road.'],
+ ['How do I pay for a booking?', d => d.kinds.flex[1] + '. Payment details are confirmed by the team after you reserve.'],
+ ['Internet is slow', d => 'Try reconnecting to ' + d.wifi + '. If it is still slow, tell me your desk number and I will log a ticket.'],
+ ['Invoice or receipt', () => 'Receipts are emailed after payment. For a company invoice, send the billing name and TRN to the team.'],
+ ['Lost and found', () => 'Ask reception. Items found on the floor are kept at the desk.'],
+ ['Lockers or storage', () => 'Ask reception about lockers and storage for members.'],
+ ['Meeting room: what equipment?', () => 'Rooms have a display for presentations and video calls. Ask the team if you need extra equipment.'],
+ ['Mail and parcels pickup', () => 'Parcels are held at reception. Bring ID when you collect.'],
+ ['Membership: what is included?', d => d.perks.join('; ') + '.'],
+ ['Noise complaint', d => logT(d) + '\nThe community team will speak with the area.'],
+ ['Opening hours', d => d.name + ': ' + d.hours + '.'],
+ ['Printing and scanning', () => 'Printing is available through reception or the shared printers. Credits depend on your plan.'],
+ ['Plug or charger not working', d => logT(d) + '\nPlease include your desk number.'],
+ ['Wi-Fi password', d => `Network: ${d.wifi}\nPassword: demo-2026 (placeholder)\nA real build would issue a one-time code per member.`],
+ ['Where is reception?', d => 'Reception is on the ' + d.floor + 'th floor. Follow the signs from the lift lobby.'],
+ ['When can I check in?', d => 'Check in at reception during ' + d.hours + '.'],
+ ['Who do I contact for urgent help?', () => 'Tell me what is wrong and I will log it as urgent. For emergencies, call building security or 999.']
+];
+const FALLBACK = 'I can help with Wi-Fi, rooms, opening hours, guest passes and facility issues. Type a letter to see suggested questions.';
+const STOP = new Set('the how can for and you are with this that what where when does have not any our my is it do to of in a an i'.split(' '));
+const norm = s => s.toLowerCase().replace(/[^a-z0-9 ]/g, '');
+function reply(q) {
+  const d = B[brand], n = norm(q);
+  const hit = QA.find(x => norm(x[0]) === n); if (hit) return hit[1](d);
+  const o = oldReply(q); if (o !== FALLBACK) return o;
+  const w = n.split(/\s+/).filter(x => x.length > 1 && !STOP.has(x)); let best = null, bs = 0;
+  QA.forEach(x => { const t = ' ' + norm(x[0]) + ' '; const s = w.filter(k => t.includes(' ' + k)).length; if (s > bs) { bs = s; best = x; } });
+  return best && bs >= 1 ? best[1](d) : FALLBACK;
+}
+
+/* Typeahead: type "A" to see questions starting with A */
+const sugBox = $('#sug'); let sugList = [], sugIdx = -1;
+function findQ(v) {
+  v = v.trim().toLowerCase(); if (!v) return [];
+  const pre = QA.filter(x => x[0].toLowerCase().startsWith(v));
+  const wd = QA.filter(x => !pre.includes(x) && x[0].toLowerCase().split(/\s+/).some(w => w.replace(/[^a-z0-9]/g, '').startsWith(v)));
+  return pre.concat(wd).slice(0, 12);
+}
+function hideSug() { sugBox.classList.add('hidden'); sugList = []; sugIdx = -1; }
+function showSug(v) {
+  sugList = findQ(v); sugIdx = -1; const raw = v.trim();
+  $('#quick').classList.toggle('hidden', !!raw);
+  if (!raw) return hideSug();
+  sugBox.classList.remove('hidden');
+  sugBox.innerHTML = sugList.length ? sugList.map((x, i) => {
+    const q = x[0], p = q.toLowerCase().startsWith(raw.toLowerCase());
+    return `<button type="button" role="option" class="sug-item" data-i="${i}">${p ? `<b>${q.slice(0, raw.length)}</b>${q.slice(raw.length)}` : q}</button>`;
+  }).join('') : '<p class="sug-empty">No matching question. Press Send and I will try to help.</p>';
+}
+function markSug() { sugBox.querySelectorAll('.sug-item').forEach((el, i) => { el.classList.toggle('active', i === sugIdx); if (i === sugIdx) el.scrollIntoView({ block: 'nearest' }); }); }
+function pickSug(i) { const q = sugList[i][0]; $('#cIn').value = ''; hideSug(); $('#quick').classList.remove('hidden'); send(q); }
+$('#cIn').addEventListener('input', e => showSug(e.target.value));
+$('#cIn').addEventListener('keydown', e => {
+  if (!sugList.length) return;
+  if (e.key === 'ArrowDown') { e.preventDefault(); sugIdx = (sugIdx + 1) % sugList.length; markSug(); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); sugIdx = (sugIdx - 1 + sugList.length) % sugList.length; markSug(); }
+  else if (e.key === 'Enter' && sugIdx >= 0) { e.preventDefault(); pickSug(sugIdx); }
+});
+sugBox.addEventListener('click', e => { const b = e.target.closest('.sug-item'); if (b) pickSug(+b.dataset.i); });
+
 function send(t) {
-  if (!t.trim()) return; msg(t, 'u'); const b = msg('', 'b'); b.innerHTML = '<span class="dot">●</span> <span class="dot">●</span> <span class="dot">●</span>';
+  if (!t.trim()) return; msg(t, 'u'); const b = msg('', 'b'); b.innerHTML = '<span class="dot"></span><span class="dot"></span><span class="dot"></span>';
   setTimeout(() => { b.textContent = reply(t); scr(); }, 650);
 }
 function resetChat() {
-  $('#msgs').replaceChildren(); msg(`Welcome to ${B[brand].name}. How can I help today?`, 'b');
-  $('#quick').innerHTML = QUICK.map(q => `<button type="button" class="q raise border px-3 py-1.5 text-xs !rounded-full hover:brightness-125" style="border-color:var(--line)">${q}</button>`).join('');
+  $('#msgs').replaceChildren(); if (typeof hideSug === 'function') hideSug(); msg(`Welcome to ${B[brand].name}. How can I help today?`, 'b');
+  $('#quick').innerHTML = QUICK.map(q => `<button type="button" class="q raise border px-3 py-1.5 text-xs font-semibold !rounded-full hover:brightness-125" style="border-color:var(--line)">${q}</button>`).join('');
 }
 $('#quick').addEventListener('click', e => { const b = e.target.closest('.q'); if (b) send(b.textContent); });
-$('#cForm').addEventListener('submit', e => { e.preventDefault(); send($('#cIn').value); $('#cIn').value = ''; });
+$('#cForm').addEventListener('submit', e => { e.preventDefault(); send($('#cIn').value); $('#cIn').value = ''; hideSug(); $('#quick').classList.remove('hidden'); });
 const chat = o => { $('#chat').classList.toggle('hidden', !o); $('#chat').classList.toggle('flex', o); $('#fab').classList.toggle('hidden', o); if (o) $('#cIn').focus(); };
 $('#fab').addEventListener('click', () => chat(true)); $('#cClose').addEventListener('click', () => chat(false));
-$('#reportBtn').addEventListener('click', () => { chat(true); send('Report Facility Issue'); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeM(); chat(false); } });
+$('#reportBtn').addEventListener('click', () => { chat(true); send('Facility issue: report'); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeM(); closeS(); chat(false); } });
 setBrand('hq');
-</script> 
-<script>
-  const toggleBtn = document.getElementById('theme-toggle');
-  const themeIcon = document.getElementById('theme-icon');
-  const themeLabel = document.getElementById('theme-label');
 
-  // Toggle between Dark and Light mode
-  toggleBtn.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    if (currentTheme === 'light') {
-      document.documentElement.removeAttribute('data-theme');
-      themeIcon.textContent = '🌙';
-      themeLabel.textContent = 'Dark';
-    } else {
-      document.documentElement.setAttribute('data-theme', 'light');
-      themeIcon.textContent = '☀️';
-      themeLabel.textContent = 'Light';
-    }
+$('#gallery').addEventListener('click', e => { const c = e.target.closest('.preview-card'); if (c) c.classList.toggle('flip'); });
+
+/* Theme toggle */
+(function () {
+  const root = document.documentElement, btn = $('#theme-toggle'), label = $('#theme-label');
+  const sync = () => {
+    const light = root.getAttribute('data-theme') === 'light';
+    label.textContent = light ? 'Light' : 'Dark';
+    btn.setAttribute('aria-label', light ? 'Switch to dark theme' : 'Switch to light theme');
+  };
+  btn.addEventListener('click', () => {
+    document.body.classList.add('swap');            // fade photo out, swap, fade in
+    setTimeout(() => {
+      if (root.getAttribute('data-theme') === 'light') root.removeAttribute('data-theme');
+      else root.setAttribute('data-theme', 'light');
+      try { localStorage.setItem('theme', root.getAttribute('data-theme') || 'dark'); } catch (e) {}
+      sync(); document.body.classList.remove('swap');
+    }, 250);
   });
+  sync();
+})();
 </script>
 </body>
 </html>

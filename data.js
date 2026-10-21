@@ -1,27 +1,18 @@
 /* Shared by index.html and space.html */
 const B = {
-  hq: { name:'HQ Coworking', mono:'HQ', sub:'Sheikh Rashid Tower · Trade Centre 2', floor:8, hours:'Mon–Fri 08:30–18:00 · members 24/7', addr:'8th Floor, Sheikh Rashid Tower, Sheikh Zayed Road, DWTC', seed:7,
-    title:'Creative working environments, eight floors above the Trade Centre.', text:'Flexi desks, private desks and meeting spaces with staffed reception on weekdays and round-the-clock access for members.',
-    chips:[['pin','DWTC, Sheikh Zayed Rd'],['clock','Mon–Fri 08:30–18:00'],['key','24/7 for members']], plan:'8th floor plan', botName:'HQ Concierge',
-    perks:['26 flexi desks and 32 private desks','2 meeting spaces','Phone booths and admin support','Direct access to DWTC exhibitions'],
-    board:[['coffee','Members’ coffee morning, Thursday'],['users','Exhibition week: book desks early'],['package','Parcel pickup now at reception']],
-    kinds:{flex:['Flexi desk','Rate confirmed by the HQ team'],priv:['Private suite · 4 desks','Rate confirmed by the HQ team'],room:['Meeting space','Rate confirmed by the HQ team']}, wifi:'HQ-Members',
+  co: { name:'Lumen Yard', mono:'LY', sub:'Halo Tower · Meridian District', floor:12, hours:'Mon–Fri 08:30–18:00 · members 24/7', addr:'Level 12, Halo Tower, Meridian District', seed:21,
+    title:'Bright, flexible workspaces above the city.', text:'Open desks, private offices, meeting rooms and an event space, with staffed reception on weekdays and round-the-clock access for members.',
+    chips:[['pin','Halo Tower, Meridian District'],['clock','Mon–Fri 08:30–18:00'],['key','24/7 for members']], plan:'Level 12 floor plan', botName:'Lumen Concierge',
+    perks:['100+ open desks and 30 private offices','2 meeting rooms and an event space','Unlimited coffee and tea','Printing credits and member events'],
+    board:[['coffee','Members’ breakfast, first Monday'],['briefcase','Workshop: setting up a small business'],['mic','Event space open for member bookings']],
+    kinds:{flex:['Open desk','Rate set by the Lumen Yard team'],priv:['Private office','Rate set by the Lumen Yard team'],room:['Meeting room','Rate set by the Lumen Yard team'],event:['Event space','Rate set by the Lumen Yard team']}, wifi:'LumenYard-Members',
     photos: [
-      { ico:'desk', title: 'Flexi Desk Area', url: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80' },
-      { ico:'door', title: 'Private Offices', url: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=600&q=80' },
-      { ico:'video', title: 'Meeting Room', url: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?auto=format&fit=crop&w=600&q=80' }
-    ]
-  },
-  maktabi: { name:'Maktabi Business Centre', mono:'M', sub:'Sheikh Rashid Tower · Trade Centre 2', floor:18, hours:'Mon–Fri 09:00–18:00', addr:'18th Floor, Sheikh Rashid Tower, Sheikh Zayed Road, DWTC', seed:21,
-    title:'Designed for your success, on the 18th floor.', text:'Over 100 flexible desks, 30 private offices, two meeting rooms and an event space, with parking and a prestigious DWTC business address.',
-    chips:[['pin','DWTC, Sheikh Zayed Rd'],['clock','Mon–Fri 09:00–18:00'],['car','Parking on site']], plan:'18th floor plan', botName:'Maktabi Concierge',
-    perks:['100+ flexible desks, 30 private offices','Unlimited coffee and tea','Business address and mail management','Printing credits and event access'],
-    board:[['coffee','Members’ breakfast, first Monday'],['briefcase','Workshop: setting up in the free zone'],['mic','Event space open for member bookings']],
-    kinds:{flex:['Flexible desk','From AED 16.50 / hour (listed rate)'],priv:['Private office','Rate confirmed by the Maktabi team'],room:['Meeting room','Rate confirmed by the Maktabi team'],event:['Event space','Rate confirmed by the Maktabi team']}, wifi:'Maktabi-Guest',
-    photos: [
-      { ico:'door', title: 'Executive Suites', url: 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?auto=format&fit=crop&w=600&q=80' },
-      { ico:'mic', title: 'Event Space', url: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=600&q=80' },
-      { ico:'coffee', title: 'Lounge & Coffee Bar', url: 'https://images.unsplash.com/photo-1527192491265-7e15c55b1ed2?auto=format&fit=crop&w=600&q=80' }
+      { ico:'desk', title: 'Open Desk Area', url: 'images/flex.svg' },
+      { ico:'door', title: 'Private Offices', url: 'images/priv.svg' },
+      { ico:'video', title: 'Meeting Rooms', url: 'images/room.svg' },
+      { ico:'mic', title: 'Event Space', url: 'images/event.svg' },
+      { ico:'coffee', title: 'Lounge & Coffee Bar', url: 'images/lounge.svg' },
+      { ico:'phone', title: 'Quiet Pods', url: 'images/pod.svg' }
     ]
   }
 };
@@ -44,6 +35,7 @@ const ICONS = {
   lock:'<rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
   video:'<path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 11"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
   desk:'<rect width="18" height="12" x="3" y="3" rx="2"/><path d="M8 21h8M12 15v6"/>',
+  phone:'<rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/>',
   door:'<path d="M18 20V6a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v14M2 20h20M14 12v.01"/>'
 };
 const ic = n => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n]}</svg>`;
@@ -51,15 +43,9 @@ const SLOTS = ['09:00 – 12:00','12:00 – 15:00','15:00 – 18:00','Full day']
 function build(b) {
   let s = B[b].seed; const rnd = () => (s = s * 16807 % 2147483647) / 2147483647, out = [];
   const add = (id, kind, x, y, w, h, label) => out.push({ id, kind, x, y, w, h, label, free: rnd() > .38 });
-  if (b === 'hq') {
-    for (let i = 0; i < 8; i++) add('S' + (i + 1), 'priv', 20 + i * 70, 20, 62, 76, 'S' + (i + 1));
-    for (let r = 0; r < 2; r++) for (let i = 0; i < 13; i++) add('F' + (r * 13 + i + 1), 'flex', 20 + i * 43, 130 + r * 42, 35, 30);
-    add('M1', 'room', 20, 236, 150, 72, 'Meeting 1'); add('M2', 'room', 184, 236, 150, 72, 'Meeting 2');
-  } else {
-    for (let i = 0; i < 15; i++) { add('O' + (i + 1), 'priv', 20 + i * 37, 14, 33, 46, 'O' + (i + 1)); add('O' + (i + 16), 'priv', 20 + i * 37, 300, 33, 40, 'O' + (i + 16)); }
-    for (let r = 0; r < 5; r++) for (let i = 0; i < 20; i++) add('D' + (r * 20 + i + 1), 'flex', 20 + i * 28, 76 + r * 24, 23, 18);
-    add('M1', 'room', 20, 208, 110, 74, 'Meeting 1'); add('M2', 'room', 140, 208, 110, 74, 'Meeting 2'); add('E1', 'event', 260, 208, 320, 74, 'Event space');
-  }
+  for (let i = 0; i < 15; i++) { add('O' + (i + 1), 'priv', 20 + i * 37, 14, 33, 46, 'O' + (i + 1)); add('O' + (i + 16), 'priv', 20 + i * 37, 300, 33, 40, 'O' + (i + 16)); }
+  for (let r = 0; r < 5; r++) for (let i = 0; i < 20; i++) add('D' + (r * 20 + i + 1), 'flex', 20 + i * 28, 76 + r * 24, 23, 18);
+  add('M1', 'room', 20, 208, 110, 74, 'Meeting 1'); add('M2', 'room', 140, 208, 110, 74, 'Meeting 2'); add('E1', 'event', 260, 208, 320, 74, 'Event space');
   return out;
 }
 const AM = {
@@ -69,12 +55,7 @@ const AM = {
   event:[['mic','AV and PA system'],['users','Flexible layout'],['wifi','Fibre Wi-Fi'],['coffee','Catering access']]
 };
 
-const KIND_PHOTO = {
-  flex: 'https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=800&q=80',
-  priv: 'https://images.unsplash.com/photo-1497215728101-856f4ea42174?auto=format&fit=crop&w=800&q=80',
-  room: 'https://images.unsplash.com/photo-1431540015161-0bf868a2d407?auto=format&fit=crop&w=800&q=80',
-  event: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?auto=format&fit=crop&w=800&q=80'
-};
+const KIND_PHOTO = { flex: 'images/flex.svg', priv: 'images/priv.svg', room: 'images/room.svg', event: 'images/event.svg' };
 const KIND_DESC = {
   flex: 'A flexible desk in the shared work area. Sit where you like, plug in and get on with your day.',
   priv: 'A lockable private space for you and your team, away from the shared floor.',
@@ -91,7 +72,7 @@ const PREFS = {
 };
 
 /* Bookings are saved in this browser only (demo) */
-const BK_KEY = 'hq_portal_bookings';
+const BK_KEY = 'lumen_yard_bookings';
 function getBookings() { try { return JSON.parse(localStorage.getItem(BK_KEY)) || {}; } catch (e) { return {}; } }
 function saveBooking(b, id, data) { try { const all = getBookings(); (all[b] = all[b] || {})[id] = data; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }
 function removeBooking(b, id) { try { const all = getBookings(); if (all[b]) delete all[b][id]; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }

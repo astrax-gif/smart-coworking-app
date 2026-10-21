@@ -77,34 +77,36 @@ function getBookings() { try { return JSON.parse(localStorage.getItem(BK_KEY)) |
 function saveBooking(b, id, data) { try { const all = getBookings(); (all[b] = all[b] || {})[id] = data; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }
 function removeBooking(b, id) { try { const all = getBookings(); if (all[b]) delete all[b][id]; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }
 
-/* Theme toggle (used on both pages): icon morph + circular reveal */
+/* Theme toggle (both pages). The page switches instantly; only the sun/moon icon animates. */
 function initTheme() {
   const root = document.documentElement, btn = document.getElementById('theme-toggle'), label = document.getElementById('theme-label');
+  const core = document.getElementById('tcore'), cut = document.getElementById('tcut'), rays = document.getElementById('trays'), g = document.getElementById('tg');
   const isLight = () => root.getAttribute('data-theme') === 'light';
+  const lerp = (a, b, t) => a + (b - a) * t, ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  /* p = 0 is a sun, p = 1 is a moon */
+  function draw(p) {
+    core.setAttribute('r', lerp(5, 8.6, p));
+    cut.setAttribute('cx', lerp(28, 17.4, p)); cut.setAttribute('cy', lerp(-4, 6.6, p));
+    const s = 1 - p * .55;
+    rays.setAttribute('transform', `translate(12 12) rotate(${p * 90}) scale(${s}) translate(-12 -12)`);
+    rays.setAttribute('opacity', Math.max(0, 1 - p * 2.4));
+    g.setAttribute('transform', `rotate(${p * -35} 12 12)`);
+  }
+  let p = isLight() ? 0 : 1, raf = 0;
+  function animateTo(target) {
+    cancelAnimationFrame(raf);
+    const from = p, t0 = performance.now(), dur = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 750;
+    const step = now => {
+      const t = dur ? Math.min(1, (now - t0) / dur) : 1; p = lerp(from, target, ease(t)); draw(p);
+      if (t < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+  }
   const sync = () => { label.textContent = isLight() ? 'Light' : 'Dark'; btn.setAttribute('aria-label', isLight() ? 'Switch to dark theme' : 'Switch to light theme'); };
-  const flip = () => {
+  btn.addEventListener('click', () => {
     if (isLight()) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'light');
     try { localStorage.setItem('theme', isLight() ? 'light' : 'dark'); } catch (e) {}
-    sync();
-  };
-  let busy = false;
-  btn.addEventListener('click', () => {
-    if (busy) return; busy = true;
-    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduce) { flip(); busy = false; return; }
-    if (document.startViewTransition) {
-      const r = btn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
-      const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
-      const t = document.startViewTransition(flip);
-      t.ready.then(() => root.animate(
-        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
-        { duration: 700, easing: 'cubic-bezier(.4, 0, .2, 1)', pseudoElement: '::view-transition-new(root)' }
-      )).catch(() => {});
-      t.finished.finally(() => { busy = false; });
-    } else {
-      root.classList.add('theme-anim'); document.body.classList.add('swap');
-      setTimeout(() => { flip(); document.body.classList.remove('swap'); setTimeout(() => { root.classList.remove('theme-anim'); busy = false; }, 600); }, 250);
-    }
+    sync(); animateTo(isLight() ? 0 : 1);
   });
-  sync();
+  draw(p); sync();
 }

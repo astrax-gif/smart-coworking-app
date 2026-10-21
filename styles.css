@@ -329,3 +329,24 @@ a.sib:hover { border-color: var(--free-stroke); color: var(--free-text); }
 .plan-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; padding-bottom: .25rem; }
 @media (max-width: 640px) { #plan { min-width: 940px; } }
 @media (hover: none) { .tip { pointer-events: auto; } .u:hover { transform: none; } }
+
+/* 16. MOBILE LIST VIEW ------------------------------------ */
+.only-mobile { display: none !important; }
+.list-only { display: none; }
+.seg { display: inline-flex; padding: 3px; border-radius: 999px; background: var(--raise); border: 1px solid var(--line); }
+.seg button { padding: .5rem 1.1rem; border-radius: 999px; font-weight: 700; font-size: .875rem; color: var(--muted); background: transparent; border: 0; cursor: pointer; }
+.seg button.on { background: var(--accent); color: var(--ink); }
+.list-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(74px, 1fr)); gap: .5rem; }
+.list-grid.list-big { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+.seat-chip { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 52px; padding: .45rem;
+  border-radius: 12px; border: 2px solid; font-weight: 700; font-size: .9rem; text-decoration: none; }
+.seat-chip small { font-weight: 600; font-size: .72rem; opacity: .9; }
+.seat-chip.free { background: var(--free-fill); border-color: var(--free-stroke); color: var(--free-text); }
+.seat-chip.occ { background: var(--occ-fill); border-color: var(--occ-stroke); color: var(--occ-text); }
+.seat-chip.sel { background: #facc15; border-color: #eab308; color: #0b132b; }
+@media (max-width: 640px) {
+  .seg.only-mobile { display: inline-flex !important; }
+  p.only-mobile { display: block !important; }
+  .view-list .plan-only { display: none !important; }
+  .view-list .list-only { display: block; }
+}

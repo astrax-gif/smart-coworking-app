@@ -77,54 +77,34 @@ function getBookings() { try { return JSON.parse(localStorage.getItem(BK_KEY)) |
 function saveBooking(b, id, data) { try { const all = getBookings(); (all[b] = all[b] || {})[id] = data; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }
 function removeBooking(b, id) { try { const all = getBookings(); if (all[b]) delete all[b][id]; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }
 
-/* ---------- Sun and moon: one resting place, real arcs between day and night ---------- */
-const SUN_PX = 100, MOON_PX = 80;
-const SUN_CSS = `position:absolute;left:0;top:0;width:${SUN_PX}px;height:${SUN_PX}px;border-radius:50%;background:#fde047;box-shadow:0 0 80px 30px rgba(250,204,21,.5)`;
-const MOON_CSS = `position:absolute;left:0;top:0;width:${MOON_PX}px;height:${MOON_PX}px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff,#e2e8f0 55%,#cbd5e1);box-shadow:0 0 50px 12px rgba(226,232,240,.28),inset -8px -6px 14px rgba(100,116,139,.35)`;
-
-/* Where the sun (day) and the moon (night) rest. Matches the sun glow baked into bg-day.svg. */
-function restPos() {
-  const W = innerWidth, H = innerHeight, s = Math.max(W / 1600, H / 900);
-  return {
-    x: Math.min((W - 1600 * s) / 2 + 1400 * s, W - 90),
-    y: Math.max(H - 900 * s + 120 * s, 105)
-  };
-}
-function placeCelestials() {
-  const r = restPos(), sun = document.getElementById('sunP'), moon = document.getElementById('moonP');
-  if (!sun || !moon) return;
-  sun.style.transform = `translate(${r.x - SUN_PX / 2}px,${r.y - SUN_PX / 2}px)`;
-  moon.style.transform = `translate(${r.x - MOON_PX / 2}px,${r.y - MOON_PX / 2}px)`;
-}
-function initCelestials() {
-  if (document.getElementById('celestials')) return;
-  const st = document.createElement('style');
-  st.textContent = '#celestials{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}' +
-    'html[data-theme="light"] #moonP{opacity:0}html:not([data-theme="light"]) #sunP{opacity:0}';
-  document.head.append(st);
-  const c = document.createElement('div'); c.id = 'celestials';
-  c.innerHTML = `<div id="sunP" style="${SUN_CSS}"></div><div id="moonP" style="${MOON_CSS}"></div>`;
-  document.body.prepend(c);
-  placeCelestials();
-  addEventListener('resize', placeCelestials);
+/* ---------- Sun and moon: one resting place, real arcs between day and night ----------
+   The resting place is baked into images/bg-day.svg (sun) and images/bg-night.svg (moon) at svg point (1250,230).
+   The transition below starts and ends exactly on it. */
+const REST = { x: 1250, y: 230, sunR: 48, moonR: 38 };
+function skyGeo() {
+  const W = document.documentElement.clientWidth, H = document.documentElement.clientHeight;
+  const s = Math.max(W / 1600, H / 900);            // same maths as background-size: cover; position: center bottom
+  return { W, H, s, x: (W - 1600 * s) / 2 + REST.x * s, y: H - (900 - REST.y) * s };
 }
 
 /* Full-screen sunset / sunrise played when the theme is toggled.
-   To dark: the sun arcs down to the right and sinks behind the skyline, then the moon climbs
-   up from behind the skyline on the left and settles in its place.
+   To dark: the sun arcs down to the right and sinks behind the skyline, then the moon climbs up from
+   behind the skyline on the left and settles in its place.
    To light: exactly the reverse. The moon goes back down, the sun rises and returns to its place. */
 let fxBusy = false;
 function skyTransition(toDark, swap) {
   if (matchMedia('(prefers-reduced-motion: reduce)').matches) { swap(); return; }
   fxBusy = true;
-  const T = 4200, W = innerWidth, H = innerHeight, R = restPos();
+  const T = 4200, G = skyGeo(), W = G.W, H = G.H, R = G;
+  const SUN = REST.sunR * G.s * 2, MOON = REST.moonR * G.s * 2;
   const base = { duration: T, fill: 'forwards', direction: toDark ? 'normal' : 'reverse' };
 
   const o = document.createElement('div');
   o.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;opacity:0';
   const mk = (css, parent) => { const e = document.createElement('div'); e.style.cssText = css; (parent || o).append(e); return e; };
+  const sky = (u) => `position:absolute;inset:0;background:url('images/${u}.svg') center bottom/cover no-repeat`;
 
-  const day = mk('position:absolute;inset:0;background:linear-gradient(180deg,#38bdf8 0%,#bae6fd 100%)');
+  const day = mk('position:absolute;inset:0;background:linear-gradient(180deg,#bfdbfe 0%,#eef6ff 55%,#f7f5ee 100%)');
   const dusk = mk('position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,#312e81 0%,#be185d 38%,#f97316 68%,#fde68a 100%)');
   const night = mk('position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,#020617 0%,#0b132b 60%,#1e1b4b 100%)');
   const stars = mk('position:absolute;inset:0;opacity:0');
@@ -133,35 +113,33 @@ function skyTransition(toDark, swap) {
     mk(`position:absolute;left:${Math.random() * 100}%;top:${Math.random() * 60}%;width:${z}px;height:${z}px;border-radius:50%;background:#fff;opacity:${.4 + Math.random() * .6}`, stars);
   }
   const glow = mk('position:absolute;left:0;right:0;top:45vh;height:55vh;opacity:0;background:radial-gradient(ellipse 60% 70% at 50% 70%,rgba(251,146,60,.85),transparent 70%)');
-  const moon = mk(MOON_CSS);
-  const sun = mk(SUN_CSS);
-  /* skyline in front: both bodies disappear behind it */
-  mk('position:absolute;left:0;right:0;top:62vh;height:38vh;background:#050816;clip-path:polygon(0 60%,6% 40%,12% 52%,18% 30%,26% 50%,35% 34%,44% 54%,52% 28%,60% 46%,68% 36%,76% 56%,84% 32%,92% 48%,100% 38%,100% 100%,0 100%)');
+  const moon = mk(`position:absolute;left:0;top:0;width:${MOON}px;height:${MOON}px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#fff,#e2e8f0 55%,#cbd5e1);box-shadow:0 0 ${MOON * .7}px ${MOON * .18}px rgba(226,232,240,.3)`);
+  const sun = mk(`position:absolute;left:0;top:0;width:${SUN}px;height:${SUN}px;border-radius:50%;background:#fde047;box-shadow:0 0 ${SUN * .8}px ${SUN * .3}px rgba(250,204,21,.5)`);
+  /* the real skyline sits in front, so the sun and moon go behind the actual buildings */
+  mk(sky('skyline-day'));
+  const cityNight = mk(sky('skyline-night') + ';opacity:0');
   document.body.append(o);
 
-  /* paths (both are quarter-ellipses with their top at the resting place) */
-  const N = 48, depth = H * .8 + 120 - R.y;
+  /* paths: quarter-ellipses whose top is the resting place */
+  const N = 48, depth = H + 30 - R.y;
   const smooth = t => t * t * (3 - 2 * t), clamp = t => Math.max(0, Math.min(1, t));
   const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
   const mix = (a, b, t) => 'rgb(' + hex(a).map((v, i) => Math.round(v + (hex(b)[i] - v) * t)).join(',') + ')';
   const sunKF = [], moonKF = [];
   for (let i = 0; i <= N; i++) {
     const u = i / N;
-    /* sun: sets during the first 65% */
-    let t = smooth(clamp(u / .65)), f = t * Math.PI / 2;
-    const sa = Math.min(W * .12, Math.max(60, W - R.x - 10));
+    let t = smooth(clamp(u / .65)), f = t * Math.PI / 2;                 // sun sets during the first 65%
+    const sa = Math.min(W * .12, Math.max(60, W - R.x));
     sunKF.push({
       offset: u,
-      transform: `translate(${R.x - SUN_PX / 2 + sa * Math.sin(f)}px,${R.y - SUN_PX / 2 + depth * (1 - Math.cos(f))}px) scale(${1 + .45 * t})`,
+      transform: `translate(${R.x - SUN / 2 + sa * Math.sin(f)}px,${R.y - SUN / 2 + depth * (1 - Math.cos(f))}px) scale(${1 + .45 * t})`,
       backgroundColor: t < .5 ? mix('#fde047', '#f97316', t / .5) : mix('#f97316', '#dc2626', (t - .5) / .5),
-      boxShadow: `0 0 ${80 + 30 * t}px ${30 + 12 * t}px ${t < .5 ? 'rgba(250,204,21,.5)' : 'rgba(249,115,22,.6)'}`
+      boxShadow: `0 0 ${SUN * .8}px ${SUN * .3}px ${t < .5 ? 'rgba(250,204,21,.5)' : 'rgba(249,115,22,.6)'}`
     });
-    /* moon: rises from behind the skyline on the left during the last 70% */
-    t = smooth(clamp((u - .3) / .7)); f = (1 - t) * Math.PI / 2;
-    const ma = W * .55;
+    t = smooth(clamp((u - .3) / .7)); f = (1 - t) * Math.PI / 2;         // moon rises during the last 70%
     moonKF.push({
       offset: u,
-      transform: `translate(${R.x - MOON_PX / 2 - ma * Math.sin(f)}px,${R.y - MOON_PX / 2 + depth * (1 - Math.cos(f))}px)`
+      transform: `translate(${R.x - MOON / 2 - W * .55 * Math.sin(f)}px,${R.y - MOON / 2 + depth * (1 - Math.cos(f))}px)`
     });
   }
   const lin = { ...base, easing: 'linear' };
@@ -173,6 +151,7 @@ function skyTransition(toDark, swap) {
   day.animate([{ opacity: 1 }, { opacity: 1, offset: .2 }, { opacity: 0, offset: .55 }, { opacity: 0 }], base);
   dusk.animate([{ opacity: 0 }, { opacity: 0, offset: .15 }, { opacity: 1, offset: .45 }, { opacity: 0, offset: .8 }, { opacity: 0 }], base);
   night.animate([{ opacity: 0 }, { opacity: 0, offset: .45 }, { opacity: 1, offset: .85 }, { opacity: 1 }], base);
+  cityNight.animate([{ opacity: 0 }, { opacity: 0, offset: .4 }, { opacity: 1, offset: .7 }, { opacity: 1 }], base);
   stars.animate([{ opacity: 0 }, { opacity: 0, offset: .6 }, { opacity: 1 }], base);
   glow.animate([{ opacity: 0 }, { opacity: 0, offset: .2 }, { opacity: 1, offset: .5 }, { opacity: 0, offset: .8 }, { opacity: 0 }], base);
 
@@ -181,7 +160,6 @@ function skyTransition(toDark, swap) {
 
 /* Theme toggle (both pages). Plays the sky transition, and the sun/moon icon morphs too. */
 function initTheme() {
-  initCelestials();
   const root = document.documentElement, btn = document.getElementById('theme-toggle'), label = document.getElementById('theme-label');
   const core = document.getElementById('tcore'), cut = document.getElementById('tcut'), rays = document.getElementById('trays'), g = document.getElementById('tg');
   const isLight = () => root.getAttribute('data-theme') === 'light';

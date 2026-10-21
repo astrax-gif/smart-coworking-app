@@ -87,17 +87,18 @@ function render() {
     right = `<div class="card p-6"><span class="badge badge-occ">${ic('lock')}Taken</span><h2 class="fh text-3xl mt-3">Not available</h2><p class="muted mt-2">${u.label} is already booked. Pick a free space on the plan, or use one of the links on this page.</p><a class="btn inline-block px-5 py-3 mt-5" style="text-decoration:none" href="index.html">Back to floor plan</a></div>`;
   } else {
     const today = new Date().toISOString().slice(0, 10);
-    right = `<form id="form" class="card p-6 space-y-5" novalidate>
+    right = `<form id="form" class="card p-6 space-y-5" action="https://formspree.io/f/mgaognkb" method="POST" novalidate>
       <div><h2 class="fh text-3xl">Book ${u.label}</h2><p class="text-sm muted">Choose your preferences. The team confirms details after you reserve.</p></div>
-      <div><label class="block text-sm mb-1" for="date">Date</label><input id="date" type="date" min="${today}" value="${today}" class="field w-full px-3 py-2.5"/></div>
+      <div><label class="block text-sm mb-1" for="date">Date</label><input id="date" name="date" type="date" min="${today}" value="${today}" class="field w-full px-3 py-2.5"/></div>
       <fieldset><legend class="text-sm mb-2">Time slot</legend><div class="flex flex-wrap gap-2">${opts('slot', SLOTS, 'radio', true)}</div></fieldset>
       <fieldset><legend class="text-sm mb-2">Drinks on arrival</legend><div class="flex flex-wrap gap-2">${opts('drinks', DRINKS.map(x => [x === 'None' ? 'x' : 'coffee', x]), 'radio', true)}</div></fieldset>
       <fieldset><legend class="text-sm mb-2">${u.kind === 'room' || u.kind === 'event' ? 'Room layout' : 'Seating'}</legend><div class="flex flex-wrap gap-2">${opts('setup', P.setup, 'radio', true)}</div></fieldset>
       <fieldset><legend class="text-sm mb-2">Extras</legend><div class="flex flex-wrap gap-2">${opts('extras', P.extras, 'checkbox', false)}</div></fieldset>
-      <div><label class="block text-sm mb-1" for="notes">Anything else? (optional)</label><textarea id="notes" rows="2" class="field w-full px-3 py-2.5" placeholder="For example: oat milk, near a window"></textarea></div>
-      <div class="grid sm:grid-cols-2 gap-3"><div><label class="block text-sm mb-1" for="fN">Full name</label><input id="fN" class="field w-full px-3 py-2.5" autocomplete="name"/></div><div><label class="block text-sm mb-1" for="fE">Email</label><input id="fE" type="email" class="field w-full px-3 py-2.5" autocomplete="email"/></div></div>
+      <div><label class="block text-sm mb-1" for="notes">Anything else? (optional)</label><textarea id="notes" name="notes" rows="2" class="field w-full px-3 py-2.5" placeholder="For example: oat milk, near a window"></textarea></div>
+      <div class="grid sm:grid-cols-2 gap-3"><div><label class="block text-sm mb-1" for="fN">Full name</label><input id="fN" name="name" class="field w-full px-3 py-2.5" autocomplete="name"/></div><div><label class="block text-sm mb-1" for="fE">Email</label><input id="fE" name="email" type="email" class="field w-full px-3 py-2.5" autocomplete="email"/></div></div>
+      <input type="hidden" name="message"/>
       <p id="err" class="text-sm err-text hidden" role="alert"></p>
-      <button class="btn w-full py-3.5 text-base">Reserve ${u.label}</button>
+      <button type="submit" class="btn w-full py-3.5 text-base">Reserve ${u.label}</button>
     </form>`;
   }
   app.innerHTML = `<div class="grid lg:grid-cols-5 gap-6 items-start pt-2">${left}<div class="lg:col-span-2 lg:sticky lg:top-6" id="side">${right}</div></div>`;
@@ -113,7 +114,7 @@ function summary(b) {
   return `<div class="raise p-4 mt-4 text-sm space-y-1.5">${rows.map(([a, v]) => `<div class="flex justify-between gap-4"><span class="muted">${a}</span><span class="font-semibold text-right">${esc(v)}</span></div>`).join('')}</div>`;
 }
 
-function onSubmit(e) {
+async function onSubmit(e) {
   e.preventDefault();
   const f = e.target, v = n => (f.querySelector(`[name="${n}"]:checked`) || {}).value, err = $('#err');
   const bad = t => { err.textContent = t; err.classList.remove('hidden'); };
@@ -126,6 +127,34 @@ function onSubmit(e) {
     slot: v('slot'), drinks: v('drinks'), setup: v('setup'), notes: $('#notes').value.trim(),
     extras: [...f.querySelectorAll('[name="extras"]:checked')].map(x => x.value)
   };
+  f.elements.message.value = [
+    `Booking request for ${u.label}`,
+    `Reference: ${data.ref}`,
+    `Name: ${data.name}`,
+    `Email: ${data.email}`,
+    `Date: ${data.date}`,
+    `Time: ${data.slot}`,
+    `Drinks: ${data.drinks}`,
+    `Setup: ${data.setup}`,
+    `Extras: ${data.extras.length ? data.extras.join(', ') : 'None'}`,
+    `Notes: ${data.notes || 'None'}`
+  ].join('\n');
+  const submit = f.querySelector('[type="submit"]');
+  submit.disabled = true;
+  submit.textContent = 'Sending...';
+  try {
+    const response = await fetch(f.action, {
+      method: f.method,
+      body: new FormData(f),
+      headers: { Accept: 'application/json' }
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(result.errors?.map(error => error.message).join(', ') || 'The booking request could not be sent. Please try again.');
+  } catch (error) {
+    submit.disabled = false;
+    submit.textContent = `Reserve ${u.label}`;
+    return bad(error.message || 'The booking request could not be sent. Please try again.');
+  }
   saveBooking(brand, u.id, data);
   $('#side').innerHTML = `<div class="card p-6 text-center"><div class="w-14 h-14 rounded-full btn mx-auto flex items-center justify-center mb-4"><svg class="ico" style="width:28px;height:28px;stroke-width:3" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
     <h2 class="fh text-3xl">You're booked in</h2><p class="muted text-sm mt-2">Check in at reception on level ${d.floor}. A confirmation was sent to ${esc(email)}.</p>

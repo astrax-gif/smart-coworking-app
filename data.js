@@ -77,7 +77,70 @@ function getBookings() { try { return JSON.parse(localStorage.getItem(BK_KEY)) |
 function saveBooking(b, id, data) { try { const all = getBookings(); (all[b] = all[b] || {})[id] = data; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }
 function removeBooking(b, id) { try { const all = getBookings(); if (all[b]) delete all[b][id]; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }
 
-/* Theme toggle (both pages). The page switches instantly; only the sun/moon icon animates. */
+/* Full-screen sunset / sunrise transition played when the theme is toggled */
+let fxBusy = false;
+function skyTransition(toDark, swap) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { swap(); return; }
+  fxBusy = true;
+  const T = 2600;
+  const base = { duration: T, fill: 'forwards', direction: toDark ? 'normal' : 'reverse' };
+  const mk = (css, parent) => { const e = document.createElement('div'); e.style.cssText = css; (parent || o).append(e); return e; };
+
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;z-index:9999;pointer-events:none;overflow:hidden;opacity:0';
+
+  // Sky layers, cross-faded: day -> dusk -> night
+  const day = mk('position:absolute;inset:0;background:linear-gradient(180deg,#38bdf8 0%,#bae6fd 100%)');
+  const dusk = mk('position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,#312e81 0%,#be185d 38%,#f97316 68%,#fde68a 100%)');
+  const night = mk('position:absolute;inset:0;opacity:0;background:linear-gradient(180deg,#020617 0%,#0b132b 60%,#1e1b4b 100%)');
+
+  // Stars
+  const stars = mk('position:absolute;inset:0;opacity:0');
+  for (let i = 0; i < 50; i++) {
+    const z = 1 + Math.random() * 2;
+    mk(`position:absolute;left:${Math.random() * 100}%;top:${Math.random() * 60}%;width:${z}px;height:${z}px;border-radius:50%;background:#fff;opacity:${.4 + Math.random() * .6}`, stars);
+  }
+
+  // Horizon glow
+  const glow = mk('position:absolute;left:0;right:0;top:50vh;height:50vh;opacity:0;background:radial-gradient(ellipse 60% 70% at 50% 60%,rgba(251,146,60,.85),transparent 70%)');
+
+  // Sun and moon (positioned by top, moved with translateY)
+  const sun = mk('position:absolute;left:50%;top:0;width:110px;height:110px;border-radius:50%;background:#facc15;box-shadow:0 0 70px 24px rgba(250,204,21,.6)');
+  const moon = mk('position:absolute;left:68%;top:0;width:76px;height:76px;border-radius:50%;box-shadow:inset -24px 0 0 0 #f1f5f9,0 0 30px 6px rgba(241,245,249,.25)');
+
+  // Ridge in front: sun and moon disappear behind it
+  mk('position:absolute;left:0;right:0;top:66vh;height:34vh;background:#050816;clip-path:polygon(0 60%,10% 45%,22% 58%,35% 38%,48% 55%,60% 42%,75% 58%,88% 44%,100% 56%,100% 100%,0 100%)');
+
+  document.body.append(o);
+
+  const ease = 'ease-in-out';
+  o.animate([{ opacity: 0 }, { opacity: 1, offset: .15 }, { opacity: 1, offset: .85 }, { opacity: 0 }], { duration: T, fill: 'forwards' })
+    .finished.then(() => { o.remove(); fxBusy = false; });
+
+  day.animate([{ opacity: 1 }, { opacity: 1, offset: .2 }, { opacity: 0, offset: .55 }, { opacity: 0 }], base);
+  dusk.animate([{ opacity: 0 }, { opacity: 0, offset: .15 }, { opacity: 1, offset: .45 }, { opacity: 0, offset: .8 }, { opacity: 0 }], base);
+  night.animate([{ opacity: 0 }, { opacity: 0, offset: .45 }, { opacity: 1, offset: .85 }, { opacity: 1 }], base);
+  stars.animate([{ opacity: 0 }, { opacity: 0, offset: .6 }, { opacity: 1 }], base);
+  glow.animate([{ opacity: 0 }, { opacity: 0, offset: .2 }, { opacity: 1, offset: .5 }, { opacity: 0, offset: .8 }, { opacity: 0 }], base);
+
+  // Sun sinks behind the ridge, getting bigger and redder
+  sun.animate([
+    { transform: 'translate(-50%,20vh) scale(1)', backgroundColor: '#facc15', boxShadow: '0 0 70px 24px rgba(250,204,21,.6)' },
+    { transform: 'translate(-50%,58vh) scale(1.3)', backgroundColor: '#f97316', boxShadow: '0 0 90px 36px rgba(249,115,22,.7)', offset: .55 },
+    { transform: 'translate(-50%,90vh) scale(1.45)', backgroundColor: '#dc2626', boxShadow: '0 0 100px 40px rgba(220,38,38,.6)' }
+  ], { ...base, easing: ease });
+
+  // Moon rises from behind the ridge after the sun is gone
+  moon.animate([
+    { transform: 'translate(-50%,92vh)', offset: 0 },
+    { transform: 'translate(-50%,92vh)', offset: .45 },
+    { transform: 'translate(-50%,22vh)', offset: 1 }
+  ], { ...base, easing: ease });
+
+  setTimeout(swap, T * .5);   // theme swaps at the midpoint, while the overlay fully covers the page
+}
+
+/* Theme toggle (both pages). Plays the sky transition, and the sun/moon icon morphs too. */
 function initTheme() {
   const root = document.documentElement, btn = document.getElementById('theme-toggle'), label = document.getElementById('theme-label');
   const core = document.getElementById('tcore'), cut = document.getElementById('tcut'), rays = document.getElementById('trays'), g = document.getElementById('tg');
@@ -104,9 +167,15 @@ function initTheme() {
   }
   const sync = () => { label.textContent = isLight() ? 'Light' : 'Dark'; btn.setAttribute('aria-label', isLight() ? 'Switch to dark theme' : 'Switch to light theme'); };
   btn.addEventListener('click', () => {
-    if (isLight()) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'light');
-    try { localStorage.setItem('theme', isLight() ? 'light' : 'dark'); } catch (e) {}
-    sync(); animateTo(isLight() ? 0 : 1);
+    if (fxBusy) return;
+    const toDark = isLight();
+    const swap = () => {
+      if (toDark) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'light');
+      try { localStorage.setItem('theme', toDark ? 'dark' : 'light'); } catch (e) {}
+      sync();
+    };
+    animateTo(toDark ? 1 : 0);
+    skyTransition(toDark, swap);
   });
   draw(p); sync();
 }

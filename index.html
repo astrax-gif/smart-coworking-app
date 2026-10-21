@@ -68,7 +68,8 @@
         <h3 id="planT" class="fh text-3xl"></h3>
         <div class="flex gap-4 text-xs font-semibold"><span><i class="sw sw-free"></i>Free</span><span><i class="sw sw-occ"></i>Taken</span><span><i class="sw sw-sel"></i>Yours</span></div>
       </div>
-      <svg id="plan" class="w-full" role="group" aria-label="Floor plan"></svg>
+      <p class="text-xs muted mb-2 sm:hidden">Swipe sideways to explore. Tap a space once to preview, tap again to open.</p>
+      <div id="planWrap" class="plan-wrap"><svg id="plan" class="w-full" role="group" aria-label="Floor plan"></svg></div>
       <div class="raise mt-4 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div><p id="sumT" class="font-semibold">Hover a space to preview it</p><p id="sumS" class="text-sm muted">Click any space to open its page.</p></div>
       </div>
@@ -155,6 +156,7 @@ function setBrand(b) {
   stats(); summary(); resetChat(); hydrate();
 }
 /* Seat hover preview + open detail page */
+const touch = matchMedia('(hover: none)');
 const tip = $('#tip'); let tipFor = null;
 function showTip(el) {
   const u = items.find(x => x.id === el.dataset.id), d = B[brand]; if (!u) return;
@@ -162,7 +164,7 @@ function showTip(el) {
   tip.innerHTML = `<div class="tip-card"><div class="tip-photo" style="background-image:url('${KIND_PHOTO[u.kind]}')"><span class="badge ${st[0]}">${ic(st[1])}${st[2]}</span></div>
     <div class="p-3"><p class="fh text-2xl leading-none">${u.label}</p><p class="text-xs muted mt-1">${k[0]} · ${d.floor}F</p>
     <div class="flex gap-3 mt-2 accent">${AM[u.kind].slice(0, 4).map(a => ic(a[0])).join('')}</div>
-    <p class="text-xs font-semibold mt-2">${u.free || u.mine ? 'Click to see details and book' : 'Click to see details'} →</p></div></div>`;
+    <p class="text-xs font-semibold mt-2">${touch.matches ? 'Tap again to open' : (u.free || u.mine ? 'Click to see details and book' : 'Click to see details')} →</p></div></div>`;
   tip.classList.remove('hidden', 'tip-in'); void tip.offsetWidth; tip.classList.add('tip-in');
   const r = el.getBoundingClientRect(), w = tip.offsetWidth, th = tip.offsetHeight;
   let left = Math.min(Math.max(8, r.left + r.width / 2 - w / 2), innerWidth - w - 8), top = r.top - th - 10;
@@ -171,13 +173,20 @@ function showTip(el) {
 }
 function hideTip() { tip.classList.add('hidden'); tipFor = null; }
 const seatEl = e => e.target.closest && e.target.closest('.u');
-$('#plan').addEventListener('mouseover', e => { const t = seatEl(e); if (t && t !== tipFor) showTip(t); });
-$('#plan').addEventListener('mouseout', e => { const to = e.relatedTarget; if (!(to && to.closest && to.closest('.u'))) hideTip(); });
-$('#plan').addEventListener('focusin', e => { const t = seatEl(e); if (t) showTip(t); });
-$('#plan').addEventListener('focusout', hideTip);
+$('#plan').addEventListener('mouseover', e => { if (touch.matches) return; const t = seatEl(e); if (t && t !== tipFor) showTip(t); });
+$('#plan').addEventListener('mouseout', e => { if (touch.matches) return; const to = e.relatedTarget; if (!(to && to.closest && to.closest('.u'))) hideTip(); });
+$('#plan').addEventListener('focusin', e => { if (touch.matches) return; const t = seatEl(e); if (t) showTip(t); });
+$('#plan').addEventListener('focusout', () => { if (!touch.matches) hideTip(); });
 addEventListener('scroll', hideTip, { passive: true });
 const openSeat = id => { location.href = `space.html?id=${encodeURIComponent(id)}`; };
-$('#plan').addEventListener('click', e => { const t = seatEl(e); if (t) openSeat(t.dataset.id); });
+$('#plan').addEventListener('click', e => {
+  const t = seatEl(e); if (!t) return;
+  if (touch.matches && tipFor !== t) { showTip(t); return; }   // touch: first tap = preview
+  openSeat(t.dataset.id);
+});
+tip.addEventListener('click', () => { if (tipFor) openSeat(tipFor.dataset.id); });
+document.addEventListener('click', e => { if (touch.matches && !e.target.closest('.u') && !e.target.closest('#tip')) hideTip(); });
+$('#planWrap').addEventListener('scroll', hideTip, { passive: true });
 $('#plan').addEventListener('keydown', e => { const t = seatEl(e); if (t && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openSeat(t.dataset.id); } });
 
 /* Chat */

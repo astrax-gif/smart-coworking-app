@@ -1,5 +1,5 @@
 /* =========================================================
-   HQ Coworking · Tenant Portal  —  styles.css
+   Lumen Yard · Tenant Portal  —  styles.css
    Dark = default. Light = <html data-theme="light">
    ========================================================= */
 
@@ -48,18 +48,15 @@
   --bldg-frame: rgba(255, 255, 255, 0.28);
   --bldg-side: rgba(148, 163, 184, 0.3);
 
-  /* Dark mode only: overlay + photo. Layers load in order: your own file in /images,
-     then an online photo of the tower, then a generic skyline. First one that loads wins. */
+  /* Artwork lives in /images. Swap bg-night.svg / bg-day.svg for your own AI-generated images here. */
   --bg-base: #0b132b;
-  --bg-overlay: rgba(11, 19, 43, 0.85);
+  --bg-overlay: rgba(11, 19, 43, 0.3);
   --shadow: 0 10px 30px rgba(0, 0, 0, .18);
   --bg-wash: linear-gradient(var(--bg-overlay), var(--bg-overlay));
-  --bg-photo: url('images/hq-tower-night.jpg'),
-    url('https://www.dubai-online.com/wp-content/uploads/2019/10/ss_1077576197.jpg'),
-    url('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1920&q=80');
+  --bg-photo: url('images/bg-night.svg');
 }
 
-/* LIGHT: clean ivory paper + charcoal ink + HQ yellow. No photo (the photo made it look washed out). */
+/* LIGHT: soft day skyline illustration, charcoal ink, yellow accent */
 [data-theme="light"] {
   color-scheme: light;
   --accent-text: #8a5a00;       /* yellow is unreadable as text on white */
@@ -94,13 +91,11 @@
   --bldg-side: rgba(100, 116, 139, 0.35);
 
   --bg-base: #f7f5ee;
-  --bg-photo: none;
-  --bg-wash: radial-gradient(900px 480px at 88% -6%, rgba(250, 204, 21, .22), transparent 60%),
-             radial-gradient(700px 420px at -5% 20%, rgba(96, 165, 250, .10), transparent 60%),
-             linear-gradient(180deg, #fffef9 0%, #f5f2e8 100%);
+  --bg-photo: url('images/bg-day.svg');
+  --bg-wash: linear-gradient(rgba(255,255,255,0), rgba(255,255,255,0));
 }
 
-/* 2. PAGE + THEMED HQ BACKGROUND -------------------------- */
+/* 2. PAGE + THEMED BACKGROUND -------------------------- */
 html, body { min-height: 100%; }
 body {
   font-family: 'Manrope', system-ui, sans-serif;
@@ -111,7 +106,7 @@ body {
 /* Fixed photo layer: overlay on top, photo below. Cross-fades on toggle. */
 body::before, body::after {
   content: ""; position: fixed; inset: 0; z-index: -2;
-  background-size: cover; background-position: center; background-repeat: no-repeat;
+  background-size: cover; background-position: center bottom; background-repeat: no-repeat;
 }
 body::before {                       /* photo (changes with theme) */
   background-image: var(--bg-photo);

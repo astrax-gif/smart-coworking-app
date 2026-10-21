@@ -98,10 +98,10 @@
 /* 2. PAGE + THEMED BACKGROUND -------------------------- */
 html, body { min-height: 100%; }
 body {
-  font-family: 'Manrope', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
   color: var(--text);
   background: var(--bg-base);
-  transition: color .4s ease;
 }
 /* Fixed photo layer: overlay on top, photo below. Cross-fades on toggle. */
 body::before, body::after {
@@ -118,7 +118,7 @@ body::after {                        /* soft gradient overlay */
 }
 body.swap::before { opacity: 0; }    /* JS sets this briefly during toggle */
 
-.fh { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 700; letter-spacing: -.01em; }
+.fh { font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif; font-weight: 800; letter-spacing: -.025em; }
 .muted { color: var(--muted); }
 .accent { color: var(--accent-text); }
 :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
@@ -131,7 +131,6 @@ body.swap::before { opacity: 0; }    /* JS sets this briefly during toggle */
   border-radius: var(--r);
   color: var(--text);
   box-shadow: var(--shadow);
-  transition: background .4s ease, border-color .4s ease;
 }
 /* Booking panel ("8th Floor Plan") */
 .glass-panel {
@@ -348,23 +347,7 @@ a.sib:hover { border-color: var(--free-stroke); color: var(--free-text); }
   .view-list .list-only { display: block; }
 }
 
-/* 17. THEME TOGGLE: sun <-> moon morph + page reveal ------ */
-.theme-toggle .ti { position: relative; display: inline-block; width: 20px; height: 20px; flex: none; }
-.theme-toggle .ti svg { position: absolute; inset: 0; width: 20px; height: 20px;
-  transition: transform .7s cubic-bezier(.4, 0, .2, 1), opacity .45s ease; transform-origin: 50% 50%; }
-.theme-toggle .i-moon { opacity: 1; transform: rotate(0) scale(1); }
-.theme-toggle .i-sun  { opacity: 0; transform: rotate(-120deg) scale(.2); }
-[data-theme="light"] .theme-toggle .i-moon { opacity: 0; transform: rotate(120deg) scale(.2); }
-[data-theme="light"] .theme-toggle .i-sun  { opacity: 1; transform: rotate(0) scale(1); }
-.theme-toggle:active .ti { transform: scale(.9); }
-.theme-toggle .ti { transition: transform .15s ease; }
-
-/* Circular reveal (View Transitions API) */
-::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-::view-transition-old(root) { z-index: 1; }
-::view-transition-new(root) { z-index: 2; }
-
-/* Fallback for browsers without View Transitions: colours ease over .5s */
-html.theme-anim :where(body, .card, .raise, .chip, .field, .panel, .theme-toggle, .badge, .seat-chip, .u, .opt span, .sl, .seg) {
-  transition: background-color .5s ease, color .5s ease, border-color .5s ease, fill .5s ease, stroke .5s ease, box-shadow .5s ease;
-}
+/* 17. THEME TOGGLE ICON (sun <-> moon morph is animated in data.js) */
+.theme-toggle .ti { display: inline-block; width: 22px; height: 22px; flex: none; }
+.theme-toggle .ti svg { width: 22px; height: 22px; display: block; overflow: visible; }
+.theme-toggle:active .ti { transform: scale(.92); }

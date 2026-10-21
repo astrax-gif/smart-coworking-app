@@ -14,7 +14,7 @@
 <header class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
   <div class="flex items-center gap-3">
     <a id="back" class="back-link" href="index.html"><svg class="ico" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>Floor plan</a>
-    <div class="fh w-10 h-10 flex items-center justify-center text-lg btn" aria-hidden="true"><span id="logoTxt">HQ</span></div>
+    <div class="fh w-10 h-10 flex items-center justify-center text-lg btn" aria-hidden="true"><span id="logoTxt">LY</span></div>
     <p id="bName" class="fh text-2xl hidden sm:block"></p>
   </div>
   <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light theme">
@@ -31,7 +31,7 @@
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const q = new URLSearchParams(location.search);
-const brand = B[q.get('b')] ? q.get('b') : 'hq', d = B[brand], id = q.get('id');
+const brand = 'co', d = B[brand], id = q.get('id');
 const items = build(brand), bk = getBookings()[brand] || {};
 items.forEach(u => { if (bk[u.id]) { u.free = false; u.mine = true; } });
 const u = items.find(x => x.id === id);
@@ -61,7 +61,7 @@ function render() {
     <div class="lg:col-span-3 space-y-6">
       <div class="hero-photo" style="background-image:url('${KIND_PHOTO[u.kind]}')">${badge(u)}</div>
       <div class="card p-6">
-        <p class="text-sm muted flex items-center gap-1">${ic('pin')}${d.floor}F · Sheikh Rashid Tower · Sheikh Zayed Road</p>
+        <p class="text-sm muted flex items-center gap-1">${ic('pin')}${d.addr}</p>
         <h1 class="fh text-5xl mt-1">${u.label}</h1>
         <p class="accent font-semibold mt-1">${k[0]}</p>
         <p class="mt-4">${KIND_DESC[u.kind]}</p>
@@ -70,7 +70,7 @@ function render() {
         <h2 class="fh text-2xl mt-6 mb-3">Good to know</h2>
         <dl class="grid grid-cols-2 gap-y-2 text-sm"><dt class="muted">Rate</dt><dd class="font-semibold">${k[1]}</dd><dt class="muted">Opening hours</dt><dd class="font-semibold">${d.hours}</dd><dt class="muted">Wi-Fi</dt><dd class="font-semibold">${d.wifi}</dd><dt class="muted">Workspace</dt><dd class="font-semibold">${d.name}</dd></dl>
       </div>
-      ${sibs.length && !u.free ? `<div class="card p-6"><h2 class="fh text-2xl mb-3">Other free ${k[0].toLowerCase()} spaces</h2><div class="flex flex-wrap gap-2">${sibs.map(s => `<a class="sib" href="space.html?b=${brand}&id=${s.id}">${s.label}</a>`).join('')}</div></div>` : ''}
+      ${sibs.length && !u.free ? `<div class="card p-6"><h2 class="fh text-2xl mb-3">Other free ${k[0].toLowerCase()} spaces</h2><div class="flex flex-wrap gap-2">${sibs.map(s => `<a class="sib" href="space.html?id=${s.id}">${s.label}</a>`).join('')}</div></div>` : ''}
     </div>`;
 
   let right;
@@ -117,13 +117,13 @@ function onSubmit(e) {
   if (!name) return bad('Enter your full name.');
   if (!/^\S+@\S+\.\S+$/.test(email)) return bad('Enter a valid email address.');
   const data = {
-    ref: d.mono.replace('M', 'MK') + '-' + Math.floor(1000 + Math.random() * 9000), name, email, date: $('#date').value,
+    ref: 'LY-' + Math.floor(1000 + Math.random() * 9000), name, email, date: $('#date').value,
     slot: v('slot'), drinks: v('drinks'), setup: v('setup'), notes: $('#notes').value.trim(),
     extras: [...f.querySelectorAll('[name="extras"]:checked')].map(x => x.value)
   };
   saveBooking(brand, u.id, data);
   $('#side').innerHTML = `<div class="card p-6 text-center"><div class="w-14 h-14 rounded-full btn mx-auto flex items-center justify-center mb-4"><svg class="ico" style="width:28px;height:28px;stroke-width:3" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div>
-    <h2 class="fh text-3xl">You're booked in</h2><p class="muted text-sm mt-2">Check in at reception, ${d.floor}th floor. A confirmation was sent to ${esc(email)}.</p>
+    <h2 class="fh text-3xl">You're booked in</h2><p class="muted text-sm mt-2">Check in at reception on level ${d.floor}. A confirmation was sent to ${esc(email)}.</p>
     <div class="text-left">${summary(data)}</div><a class="btn block py-3 mt-5" style="text-decoration:none" href="index.html">Back to floor plan</a></div>`;
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }

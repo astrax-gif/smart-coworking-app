@@ -324,3 +324,8 @@ a.sib { display: inline-block; padding: .4rem .8rem; border-radius: 999px; font-
 a.sib:hover { border-color: var(--free-stroke); color: var(--free-text); }
 
 .tip.hidden, #sug.hidden { display: none; }
+
+/* 15. MOBILE: keep seats big enough to tap ---------------- */
+.plan-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 8px; padding-bottom: .25rem; }
+@media (max-width: 640px) { #plan { min-width: 940px; } }
+@media (hover: none) { .tip { pointer-events: auto; } .u:hover { transform: none; } }

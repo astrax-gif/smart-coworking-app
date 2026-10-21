@@ -77,17 +77,34 @@ function getBookings() { try { return JSON.parse(localStorage.getItem(BK_KEY)) |
 function saveBooking(b, id, data) { try { const all = getBookings(); (all[b] = all[b] || {})[id] = data; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }
 function removeBooking(b, id) { try { const all = getBookings(); if (all[b]) delete all[b][id]; localStorage.setItem(BK_KEY, JSON.stringify(all)); } catch (e) {} }
 
-/* Theme toggle (used on both pages) */
+/* Theme toggle (used on both pages): icon morph + circular reveal */
 function initTheme() {
   const root = document.documentElement, btn = document.getElementById('theme-toggle'), label = document.getElementById('theme-label');
-  const sync = () => { const l = root.getAttribute('data-theme') === 'light'; label.textContent = l ? 'Light' : 'Dark'; btn.setAttribute('aria-label', l ? 'Switch to dark theme' : 'Switch to light theme'); };
+  const isLight = () => root.getAttribute('data-theme') === 'light';
+  const sync = () => { label.textContent = isLight() ? 'Light' : 'Dark'; btn.setAttribute('aria-label', isLight() ? 'Switch to dark theme' : 'Switch to light theme'); };
+  const flip = () => {
+    if (isLight()) root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'light');
+    try { localStorage.setItem('theme', isLight() ? 'light' : 'dark'); } catch (e) {}
+    sync();
+  };
+  let busy = false;
   btn.addEventListener('click', () => {
-    document.body.classList.add('swap');
-    setTimeout(() => {
-      if (root.getAttribute('data-theme') === 'light') root.removeAttribute('data-theme'); else root.setAttribute('data-theme', 'light');
-      try { localStorage.setItem('theme', root.getAttribute('data-theme') || 'dark'); } catch (e) {}
-      sync(); document.body.classList.remove('swap');
-    }, 250);
+    if (busy) return; busy = true;
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) { flip(); busy = false; return; }
+    if (document.startViewTransition) {
+      const r = btn.getBoundingClientRect(), x = r.left + r.width / 2, y = r.top + r.height / 2;
+      const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      const t = document.startViewTransition(flip);
+      t.ready.then(() => root.animate(
+        { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+        { duration: 700, easing: 'cubic-bezier(.4, 0, .2, 1)', pseudoElement: '::view-transition-new(root)' }
+      )).catch(() => {});
+      t.finished.finally(() => { busy = false; });
+    } else {
+      root.classList.add('theme-anim'); document.body.classList.add('swap');
+      setTimeout(() => { flip(); document.body.classList.remove('swap'); setTimeout(() => { root.classList.remove('theme-anim'); busy = false; }, 600); }, 250);
+    }
   });
   sync();
 }

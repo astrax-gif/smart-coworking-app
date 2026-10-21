@@ -42,7 +42,7 @@ const ic = n => `<svg class="ico" viewBox="0 0 24 24" aria-hidden="true">${ICONS
 const SLOTS = ['09:00 – 12:00','12:00 – 15:00','15:00 – 18:00','Full day'];
 function build(b) {
   let s = B[b].seed; const rnd = () => (s = s * 16807 % 2147483647) / 2147483647, out = [];
-  const add = (id, kind, x, y, w, h, label) => out.push({ id, kind, x, y, w, h, label, free: rnd() > .38 });
+  const add = (id, kind, x, y, w, h, label) => out.push({ id, kind, x, y, w, h, label: label || id, free: rnd() > .38 });
   for (let i = 0; i < 15; i++) { add('O' + (i + 1), 'priv', 20 + i * 37, 14, 33, 46, 'O' + (i + 1)); add('O' + (i + 16), 'priv', 20 + i * 37, 300, 33, 40, 'O' + (i + 16)); }
   for (let r = 0; r < 5; r++) for (let i = 0; i < 20; i++) add('D' + (r * 20 + i + 1), 'flex', 20 + i * 28, 76 + r * 24, 23, 18);
   add('M1', 'room', 20, 208, 110, 74, 'Meeting 1'); add('M2', 'room', 140, 208, 110, 74, 'Meeting 2'); add('E1', 'event', 260, 208, 320, 74, 'Event space');

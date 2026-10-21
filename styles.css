@@ -170,9 +170,6 @@ body.swap::before { opacity: 0; }    /* JS sets this briefly during toggle */
   font-weight: 600; font-size: .875rem; transition: border-color .2s;
 }
 .theme-toggle:hover { border-color: var(--accent); }
-.theme-toggle .i-sun { display: none; }
-[data-theme="light"] .theme-toggle .i-sun { display: block; }
-[data-theme="light"] .theme-toggle .i-moon { display: none; }
 .theme-toggle svg { color: var(--accent-text); }
 
 /* 5. FORMS (high contrast) -------------------------------- */
@@ -349,4 +346,25 @@ a.sib:hover { border-color: var(--free-stroke); color: var(--free-text); }
   p.only-mobile { display: block !important; }
   .view-list .plan-only { display: none !important; }
   .view-list .list-only { display: block; }
+}
+
+/* 17. THEME TOGGLE: sun <-> moon morph + page reveal ------ */
+.theme-toggle .ti { position: relative; display: inline-block; width: 20px; height: 20px; flex: none; }
+.theme-toggle .ti svg { position: absolute; inset: 0; width: 20px; height: 20px;
+  transition: transform .7s cubic-bezier(.4, 0, .2, 1), opacity .45s ease; transform-origin: 50% 50%; }
+.theme-toggle .i-moon { opacity: 1; transform: rotate(0) scale(1); }
+.theme-toggle .i-sun  { opacity: 0; transform: rotate(-120deg) scale(.2); }
+[data-theme="light"] .theme-toggle .i-moon { opacity: 0; transform: rotate(120deg) scale(.2); }
+[data-theme="light"] .theme-toggle .i-sun  { opacity: 1; transform: rotate(0) scale(1); }
+.theme-toggle:active .ti { transform: scale(.9); }
+.theme-toggle .ti { transition: transform .15s ease; }
+
+/* Circular reveal (View Transitions API) */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-old(root) { z-index: 1; }
+::view-transition-new(root) { z-index: 2; }
+
+/* Fallback for browsers without View Transitions: colours ease over .5s */
+html.theme-anim :where(body, .card, .raise, .chip, .field, .panel, .theme-toggle, .badge, .seat-chip, .u, .opt span, .sl, .seg) {
+  transition: background-color .5s ease, color .5s ease, border-color .5s ease, fill .5s ease, stroke .5s ease, box-shadow .5s ease;
 }

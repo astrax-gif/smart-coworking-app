@@ -63,13 +63,15 @@
 
   <div class="grid lg:grid-cols-3 gap-6">
     <!-- Floor plan -->
-    <section class="lg:col-span-2 card glass-panel p-5 sm:p-6">
+    <section id="planPanel" class="lg:col-span-2 card glass-panel p-5 sm:p-6">
       <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
         <h3 id="planT" class="fh text-3xl"></h3>
         <div class="flex gap-4 text-xs font-semibold"><span><i class="sw sw-free"></i>Free</span><span><i class="sw sw-occ"></i>Taken</span><span><i class="sw sw-sel"></i>Yours</span></div>
       </div>
-      <p class="text-xs muted mb-2 sm:hidden">Swipe sideways to explore. Tap a space once to preview, tap again to open.</p>
-      <div id="planWrap" class="plan-wrap"><svg id="plan" class="w-full" role="group" aria-label="Floor plan"></svg></div>
+      <div class="seg only-mobile mb-3" role="tablist" aria-label="View"><button id="vList" type="button" role="tab">List</button><button id="vPlan" type="button" role="tab">Floor plan</button></div>
+      <div id="list" class="list-only"><label class="opt mb-1"><input type="checkbox" id="freeOnly" checked><span>Free only</span></label><div id="listBody"></div></div>
+      <p class="text-xs muted mb-2 plan-only only-mobile">Swipe sideways to explore. Tap a space once to preview, tap again to open.</p>
+      <div id="planWrap" class="plan-wrap plan-only"><svg id="plan" class="w-full" role="group" aria-label="Floor plan"></svg></div>
       <div class="raise mt-4 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div><p id="sumT" class="font-semibold">Hover a space to preview it</p><p id="sumS" class="text-sm muted">Click any space to open its page.</p></div>
       </div>
@@ -126,7 +128,31 @@ function drawPlan() {
     const txt = u.w > 60 ? `<text class="lbl ${lc}" x="${u.x + u.w / 2}" y="${u.y + u.h / 2 + 4}" text-anchor="middle">${u.label}</text>` : '';
     return `<rect class="${cls}" data-id="${u.id}" x="${u.x}" y="${u.y}" width="${u.w}" height="${u.h}" rx="4" tabindex="0" role="button" aria-label="${u.label}, ${k}, ${u.free ? 'free' : 'taken'}"></rect>${txt}`;
   }).join('');
+  renderList();
 }
+
+/* Mobile list view: vertical scroll, big tap targets */
+const GROUPS = [['room', 'Meeting rooms'], ['event', 'Event space'], ['priv', 'Private offices'], ['flex', 'Open desks']];
+function renderList() {
+  const freeOnly = $('#freeOnly').checked, d = B[brand];
+  $('#listBody').innerHTML = GROUPS.map(([k, name]) => {
+    const all = items.filter(u => u.kind === k); if (!all.length) return '';
+    const free = all.filter(u => u.free || u.mine).length, shown = all.filter(u => !freeOnly || u.free || u.mine);
+    const big = k === 'room' || k === 'event';
+    const chips = shown.map(u => {
+      const st = u.mine ? 'sel' : u.free ? 'free' : 'occ', txt = u.mine ? 'Yours' : u.free ? 'Free' : 'Taken';
+      return `<a class="seat-chip ${st}" href="space.html?id=${encodeURIComponent(u.id)}" aria-label="${u.label}, ${d.kinds[k][0]}, ${txt}">${u.label}${big ? `<small>${txt}</small>` : ''}</a>`;
+    }).join('') || '<p class="muted text-sm">Nothing free right now.</p>';
+    return `<h4 class="fh text-2xl mt-5 mb-2">${name} <span class="text-sm muted font-semibold">· ${free} free</span></h4><div class="list-grid ${big ? 'list-big' : ''}">${chips}</div>`;
+  }).join('');
+}
+$('#freeOnly').addEventListener('change', renderList);
+function setView(v) {
+  $('#planPanel').classList.toggle('view-list', v === 'list');
+  $('#vList').classList.toggle('on', v === 'list'); $('#vPlan').classList.toggle('on', v === 'plan'); hideTip();
+}
+$('#vList').addEventListener('click', () => setView('list'));
+$('#vPlan').addEventListener('click', () => setView('plan'));
 function stats() {
   const f = k => items.filter(u => u.kind === k && u.free).length, d = B[brand];
   const cells = [[f('flex'), 'free desks'], [f('priv'), 'free offices'], [f('room'), 'free rooms']];
@@ -134,7 +160,7 @@ function stats() {
 }
 function summary() {
   const mine = items.filter(u => u.mine);
-  $('#sumT').textContent = mine.length ? 'Your bookings: ' + mine.map(u => u.label).join(', ') : 'Hover a space to preview it';
+  $('#sumT').textContent = mine.length ? 'Your bookings: ' + mine.map(u => u.label).join(', ') : (touch.matches ? 'Pick a space to see its details' : 'Hover a space to preview it');
   $('#sumS').textContent = mine.length ? 'Shown in yellow on the plan. Click one to review it.' : 'Click any space to open its page, choose your preferences and book.';
   drawPlan();
 }
@@ -310,6 +336,7 @@ $('#fab').addEventListener('click', () => chat(true)); $('#cClose').addEventList
 $('#reportBtn').addEventListener('click', () => { chat(true); send('Facility issue: report'); });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') { hideTip(); chat(false); } });
 setBrand('co');
+setView(matchMedia('(max-width: 640px)').matches ? 'list' : 'plan');
 
 $('#gallery').addEventListener('click', e => { const c = e.target.closest('.preview-card'); if (c) c.classList.toggle('flip'); });
 

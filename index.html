@@ -6,7 +6,8 @@
 <title>Lumen Yard · Tenant Portal</title>
 <script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
 <link rel="stylesheet" href="styles.css">
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@600;700&family=Manrope:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="min-h-screen antialiased">
@@ -18,9 +19,13 @@
   </div>
   <div class="flex items-center gap-3">
     <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Switch to light theme">
-      <span class="ti"><svg class="ico i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
-      <svg class="ico i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></span>
-      <span id="theme-label">Dark</span>
+      <span class="ti"><svg id="themeIcon" viewBox="0 0 24 24" aria-hidden="true">
+      <defs><mask id="tmask"><rect width="24" height="24" fill="#fff"/><circle id="tcut" cx="28" cy="-4" r="7.5" fill="#000"/></mask></defs>
+      <g id="tg"><g id="trays" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <line x1="12" y1="1.5" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22.5"/><line x1="1.5" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22.5" y2="12"/>
+        <line x1="4.6" y1="4.6" x2="6.4" y2="6.4"/><line x1="17.6" y1="17.6" x2="19.4" y2="19.4"/><line x1="4.6" y1="19.4" x2="6.4" y2="17.6"/><line x1="17.6" y1="6.4" x2="19.4" y2="4.6"/>
+      </g><circle id="tcore" cx="12" cy="12" r="5" fill="currentColor" mask="url(#tmask)"/></g></svg></span>
+    <span id="theme-label">Dark</span>
     </button>
   </div>
 </header>

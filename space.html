@@ -32,6 +32,7 @@
 <main id="app" class="max-w-6xl mx-auto px-4 sm:px-6 pb-20"></main>
 
 <script src="data.js"></script>
+<script src="api.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -73,7 +74,7 @@ function render() {
         <h2 class="fh text-2xl mt-6 mb-3">Amenities</h2>
         <ul class="grid sm:grid-cols-2 gap-2 text-sm">${AM[u.kind].map(([i, t]) => `<li class="raise flex items-center gap-2 px-3 py-2.5"><span class="accent">${ic(i)}</span>${t}</li>`).join('')}</ul>
         <h2 class="fh text-2xl mt-6 mb-3">Good to know</h2>
-        <dl class="grid grid-cols-2 gap-y-2 text-sm"><dt class="muted">Rate</dt><dd class="font-semibold">${k[1]}</dd><dt class="muted">Opening hours</dt><dd class="font-semibold">${d.hours}</dd><dt class="muted">Wi-Fi</dt><dd class="font-semibold">${d.wifi}</dd><dt class="muted">Workspace</dt><dd class="font-semibold">${d.name}</dd></dl>
+        <dl class="grid grid-cols-2 gap-y-2 text-sm"><dt class="muted">Rate</dt><dd class="font-semibold">${k[1]}${u.free && u.deal ? ` · ${POWER.pct}% off` : ''}</dd>${u.kind === 'flex' || u.kind === 'priv' ? `<dt class="muted">Noise</dt><dd class="font-semibold">${ZONE[u.zone]}</dd><dt class="muted">Light</dt><dd class="font-semibold">${SUN[u.sun]}</dd>` : ''}<dt class="muted">Opening hours</dt><dd class="font-semibold">${d.hours}</dd><dt class="muted">Wi-Fi</dt><dd class="font-semibold">${d.wifi}</dd><dt class="muted">Workspace</dt><dd class="font-semibold">${d.name}</dd></dl>
       </div>
       ${sibs.length && !u.free ? `<div class="card p-6"><h2 class="fh text-2xl mb-3">Other free ${k[0].toLowerCase()} spaces</h2><div class="flex flex-wrap gap-2">${sibs.map(s => `<a class="sib" href="space.html?id=${s.id}">${s.label}</a>`).join('')}</div></div>` : ''}
     </div>`;
@@ -89,6 +90,7 @@ function render() {
     const today = new Date().toISOString().slice(0, 10);
     right = `<form id="form" class="card p-6 space-y-5" action="https://formspree.io/f/mgaognkb" method="POST" novalidate>
       <div><h2 class="fh text-3xl">Book ${u.label}</h2><p class="text-sm muted">Choose your preferences. The team confirms details after you reserve.</p></div>
+      ${u.deal ? `<div class="raise p-3 text-sm"><span class="accent font-bold">Power Hour</span> · ${POWER.pct}% off this open desk right now. Demo offer, the team confirms the final rate.</div>` : ''}
       <div><label class="block text-sm mb-1" for="date">Date</label><input id="date" name="date" type="date" min="${today}" value="${today}" class="field w-full px-3 py-2.5"/></div>
       <fieldset><legend class="text-sm mb-2">Time slot</legend><div class="flex flex-wrap gap-2">${opts('slot', SLOTS, 'radio', true)}</div></fieldset>
       <fieldset><legend class="text-sm mb-2">Drinks on arrival</legend><div class="flex flex-wrap gap-2">${opts('drinks', DRINKS.map(x => [x === 'None' ? 'x' : 'coffee', x]), 'radio', true)}</div></fieldset>
@@ -109,7 +111,8 @@ function render() {
 }
 
 function summary(b) {
-  const rows = [['Reference', b.ref], ['Name', b.name], ['Date', b.date], ['Time', b.slot], ['Drinks', b.drinks], ['Setup', b.setup], ['Extras', b.extras.length ? b.extras.join(', ') : 'None']];
+  const rows = [['Reference', b.ref], ['Status', b.status || 'pending'], ['Name', b.name], ['Date', b.date], ['Time', b.slot], ['Drinks', b.drinks], ['Setup', b.setup], ['Extras', b.extras.length ? b.extras.join(', ') : 'None']];
+  if (b.wifi) rows.push(['Guest Wi-Fi', b.wifi.net], ['Wi-Fi code', b.wifi.code]);
   if (b.notes) rows.push(['Notes', b.notes]);
   return `<div class="raise p-4 mt-4 text-sm space-y-1.5">${rows.map(([a, v]) => `<div class="flex justify-between gap-4"><span class="muted">${a}</span><span class="font-semibold text-right">${esc(v)}</span></div>`).join('')}</div>`;
 }
@@ -123,10 +126,18 @@ async function onSubmit(e) {
   if (!name) return bad('Enter your full name.');
   if (!/^\S+@\S+\.\S+$/.test(email)) return bad('Enter a valid email address.');
   const data = {
-    ref: 'LY-' + Math.floor(1000 + Math.random() * 9000), name, email, date: $('#date').value,
+    status: 'pending', ref: 'LY-' + Math.floor(1000 + Math.random() * 9000), name, email, date: $('#date').value,
     slot: v('slot'), drinks: v('drinks'), setup: v('setup'), notes: $('#notes').value.trim(),
     extras: [...f.querySelectorAll('[name="extras"]:checked')].map(x => x.value)
   };
+  const sb = f.querySelector('[type="submit"]'); sb.disabled = true; sb.textContent = 'Saving...';
+  try {
+    const r = await API.createBooking({ space: u.id, name, email, date: data.date, slot: data.slot, drinks: data.drinks, setup: data.setup, extras: data.extras, notes: data.notes });
+    Object.assign(data, { ref: r.ref, status: r.status, wifi: r.wifi });
+  } catch (err) {
+    if (!err.offline) { sb.disabled = false; sb.textContent = `Reserve ${u.label}`; return bad(err.message); }
+    data.wifi = guestWifi(d);   // no backend reachable: demo mode, saved in this browser only
+  }
   f.elements.message.value = [
     `Booking request for ${u.label}`,
     `Reference: ${data.ref}`,
@@ -137,6 +148,7 @@ async function onSubmit(e) {
     `Drinks: ${data.drinks}`,
     `Setup: ${data.setup}`,
     `Extras: ${data.extras.length ? data.extras.join(', ') : 'None'}`,
+    `Guest Wi-Fi: ${data.wifi.net} / ${data.wifi.code}`,
     `Notes: ${data.notes || 'None'}`
   ].join('\n');
   const submit = f.querySelector('[type="submit"]');

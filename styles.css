@@ -351,3 +351,13 @@ a.sib:hover { border-color: var(--free-stroke); color: var(--free-text); }
 .theme-toggle .ti { display: inline-block; width: 22px; height: 22px; flex: none; }
 .theme-toggle .ti svg { width: 22px; height: 22px; display: block; overflow: visible; }
 .theme-toggle:active .ti { transform: scale(.92); }
+
+/* Desk filters, Power Hour */
+.zbtn { border:1px solid var(--line); border-radius:999px; padding:.35rem .9rem; font-size:.8rem; font-weight:600; background:transparent; color:var(--muted); cursor:pointer; transition:.15s; }
+.zbtn:hover { color:var(--text); border-color:var(--muted); }
+.zbtn.on { background:var(--accent); border-color:var(--accent); color:var(--ink, #fff); }
+.u.dim { opacity:.22; }
+#plan.f-quiet .u:not(.dim).free { fill:rgba(96,165,250,.3) !important; stroke:#60a5fa !important; }
+#plan.f-social .u:not(.dim).free { fill:rgba(251,146,60,.3) !important; stroke:#fb923c !important; }
+#plan.f-sun .u:not(.dim).free { fill:rgba(250,204,21,.32) !important; stroke:#facc15 !important; }
+#plan.f-all .u.deal { stroke:var(--accent) !important; stroke-dasharray:3 2; stroke-width:2; }

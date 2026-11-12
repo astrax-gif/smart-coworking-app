@@ -73,6 +73,7 @@
         <h3 id="planT" class="fh text-3xl"></h3>
         <div class="flex gap-4 text-xs font-semibold"><span><i class="sw sw-free"></i>Free</span><span><i class="sw sw-occ"></i>Taken</span><span><i class="sw sw-sel"></i>Yours</span></div>
       </div>
+      <div class="mb-3"><div id="zf" class="flex flex-wrap gap-2" role="group" aria-label="Filter desks"></div><p id="zNote" class="text-xs muted mt-2 min-h-[1rem]"></p></div>
       <div class="seg only-mobile mb-3" role="tablist" aria-label="View"><button id="vList" type="button" role="tab">List</button><button id="vPlan" type="button" role="tab">Floor plan</button></div>
       <div id="list" class="list-only"><label class="opt mb-1"><input type="checkbox" id="freeOnly" checked><span>Free only</span></label><div id="listBody"></div></div>
       <p class="text-xs muted mb-2 plan-only only-mobile">Swipe sideways to explore. Tap a space once to preview, tap again to open.</p>
@@ -95,7 +96,7 @@
         <button id="reportBtn" class="w-full mt-4 border py-2.5 text-sm font-semibold hover:brightness-125 transition accent" style="border-color:var(--accent);border-radius:calc(var(--r)*.7)">Report a facility issue</button></div>
     </aside>
   </div>
-  <p class="text-xs muted mt-8 max-w-3xl">Concept prototype for a fictional coworking company. All spaces, rates and availability are simulated. Artwork is illustrated in code.</p>
+  <p class="text-xs muted mt-8 max-w-3xl">Concept prototype for a fictional coworking company. All spaces, rates and availability are simulated. Artwork is illustrated in code. <a class="accent font-semibold" href="admin.html">Staff login</a></p>
 </main>
 
 <button id="fab" class="fixed bottom-5 right-5 btn pl-4 pr-5 py-3 !rounded-full shadow-2xl flex items-center gap-2 hover:scale-105 transition">
@@ -117,17 +118,29 @@
 <div id="tip" class="tip hidden" role="tooltip"></div>
 
 <script src="data.js"></script>
+<script src="api.js"></script>
 <script>
 const hydrate = () => document.querySelectorAll('[data-ic]').forEach(el => el.innerHTML = ic(el.dataset.ic));
 const $ = s => document.querySelector(s);
 const brand = 'co';
 let items = [];
+/* Desk filter: acoustic zone and morning light */
+let zf = 'all';
+const ZF = [['all', 'All'], ['quiet', 'Quiet'], ['social', 'Social'], ['sun', 'Morning sun']];
+const ZN = { all: '', quiet: 'Quiet zone: focus work, calls go to the phone pods.', social: 'Social zone: livelier, near the coffee and lounge.', sun: 'Morning sun: desks on the sunny side early in the day.' };
+const dimmed = u => (zf === 'quiet' && u.zone !== 'quiet') || (zf === 'social' && u.zone !== 'social') || (zf === 'sun' && u.sun !== 'am');
+function renderZf() {
+  $('#zf').innerHTML = ZF.map(([k, t]) => `<button type="button" data-z="${k}" aria-pressed="${k === zf}" class="zbtn ${k === zf ? 'on' : ''}">${t}</button>`).join('');
+  $('#zNote').textContent = ZN[zf];
+}
+$('#zf').addEventListener('click', e => { const b = e.target.closest('.zbtn'); if (b) { zf = b.dataset.z; renderZf(); drawPlan(); } });
+renderZf();
 
 function drawPlan() {
   const d = B[brand], h = 355;
-  $('#plan').setAttribute('viewBox', `0 0 600 ${h}`);
+  $('#plan').setAttribute('viewBox', `0 0 600 ${h}`); $('#plan').setAttribute('class', 'w-full f-' + zf);
   $('#plan').innerHTML = `<rect class="zone" x="4" y="4" width="592" height="${h - 8}" rx="8"/>` + items.map(u => {
-    const cls = 'u ' + (u.mine ? 'sel' : u.free ? 'free' : 'occ'), k = d.kinds[u.kind][0];
+    const cls = 'u ' + (u.mine ? 'sel' : u.free ? 'free' : 'occ') + ' z-' + u.zone + (u.free && u.deal ? ' deal' : '') + (dimmed(u) ? ' dim' : ''), k = d.kinds[u.kind][0];
     
     const lc = u.mine ? 'lbl-sel' : u.free ? 'lbl-free' : 'lbl-occ';
     const txt = u.w > 60 ? `<text class="lbl ${lc}" x="${u.x + u.w / 2}" y="${u.y + u.h / 2 + 4}" text-anchor="middle">${u.label}</text>` : '';
@@ -161,7 +174,8 @@ $('#vPlan').addEventListener('click', () => setView('plan'));
 function stats() {
   const f = k => items.filter(u => u.kind === k && u.free).length, d = B[brand];
   const cells = [[f('flex'), 'free desks'], [f('priv'), 'free offices'], [f('room'), 'free rooms']];
-  $('#stats').innerHTML = cells.map(c => `<div class="raise p-3"><p class="fh text-3xl accent">${c[0]}</p><p class="text-xs muted">${c[1]}</p></div>`).join('');
+  const deals = items.filter(u => u.free && u.deal).length;
+  $('#stats').innerHTML = cells.map(c => `<div class="raise p-3"><p class="fh text-3xl accent">${c[0]}</p><p class="text-xs muted">${c[1]}</p></div>`).join('') + (deals ? `<div class="col-span-3 raise p-3 text-sm"><span class="accent font-bold">Power Hour</span> · ${deals} open desks at ${POWER.pct}% off</div>` : '');
 }
 function summary() {
   const mine = items.filter(u => u.mine);
@@ -193,7 +207,7 @@ function showTip(el) {
   const u = items.find(x => x.id === el.dataset.id), d = B[brand]; if (!u) return;
   const k = d.kinds[u.kind], st = u.mine ? ['badge-sel', 'check', 'Yours'] : u.free ? ['badge-free', 'check', 'Free'] : ['badge-occ', 'lock', 'Taken'];
   tip.innerHTML = `<div class="tip-card"><div class="tip-photo" style="background-image:url('${KIND_PHOTO[u.kind]}')"><span class="badge ${st[0]}">${ic(st[1])}${st[2]}</span></div>
-    <div class="p-3"><p class="fh text-2xl leading-none">${u.label}</p><p class="text-xs muted mt-1">${k[0]} · ${d.floor}F</p>
+    <div class="p-3"><p class="fh text-2xl leading-none">${u.label}</p><p class="text-xs muted mt-1">${k[0]} · ${d.floor}F</p>${u.kind === 'flex' || u.kind === 'priv' ? `<p class="text-xs muted mt-1">${ZONE[u.zone]} · ${SUN[u.sun]}</p>` : ''}${u.free && u.deal ? `<p class="text-xs font-bold accent mt-1">Power Hour: ${POWER.pct}% off</p>` : ''}
     <div class="flex gap-3 mt-2 accent">${AM[u.kind].slice(0, 4).map(a => ic(a[0])).join('')}</div>
     <p class="text-xs font-semibold mt-2">${touch.matches ? 'Tap again to open' : (u.free || u.mine ? 'Click to see details and book' : 'Click to see details')} →</p></div></div>`;
   tip.classList.remove('hidden', 'tip-in'); void tip.offsetWidth; tip.classList.add('tip-in');
@@ -348,6 +362,11 @@ $('#gallery').addEventListener('click', e => { const c = e.target.closest('.prev
 
 
 initTheme();
+/* Live state from the server: bookings by anyone, desks staff blocked, current offer */
+API.availability(new Date().toISOString().slice(0, 10)).then(a => {
+  saveSettings(a.settings || {}); saveBlocked(a.blocked || []); setBrand('co');
+  items.forEach(u => { if (a.taken.includes(u.id) && !u.mine) u.free = false; }); stats(); summary();
+}).catch(() => {});
 </script>
 </body>
 </html>

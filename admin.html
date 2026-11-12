@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · Lumen Yard</title>
+<script>try{if(localStorage.getItem('theme')==='light')document.documentElement.setAttribute('data-theme','light')}catch(e){}</script>
+<link rel="stylesheet" href="styles.css">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen antialiased">
+
+<!-- Login gate -->
+<div id="gate" class="max-w-sm mx-auto px-4 pt-24">
+  <form id="gForm" class="card p-6 space-y-4">
+    <h1 class="fh text-3xl">Staff login</h1>
+    <p class="text-sm muted">Lumen Yard admin. Enter the staff password.</p>
+    <input id="pw" type="password" autofocus class="field w-full px-3 py-2.5" placeholder="Passcode" autocomplete="current-password" aria-label="Passcode"/>
+    <p id="gErr" class="text-sm err-text hidden" role="alert">Wrong passcode.</p>
+    <button class="btn w-full py-3">Sign in</button>
+    <a href="index.html" class="block text-center text-sm muted">Back to customer site</a>
+  </form>
+</div>
+
+<div id="dash" class="hidden">
+<header class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+  <div class="flex items-center gap-3"><div class="fh w-10 h-10 flex items-center justify-center btn">LY</div><div><h1 class="fh text-2xl leading-tight">Lumen Yard Admin</h1><p class="text-xs muted">Bookings, desks and offers</p></div></div>
+  <div class="flex gap-2"><a href="index.html" class="zbtn" style="text-decoration:none">Customer site</a><button id="out" class="zbtn" type="button">Sign out</button></div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 pb-20 space-y-6">
+  <p id="banner" class="card p-3 text-sm err-text hidden" role="alert"></p>
+  <section id="kpi" class="grid grid-cols-2 md:grid-cols-5 gap-3"></section>
+
+  <section class="card p-5 sm:p-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <h2 class="fh text-2xl">Bookings</h2>
+      <div class="flex flex-wrap gap-2" id="bf" role="group" aria-label="Filter bookings"></div>
+      <button id="csv" class="zbtn" type="button">Export CSV</button>
+    </div>
+    <div class="overflow-x-auto"><table class="w-full text-sm text-left"><thead class="muted"><tr><th class="py-2 pr-3">Ref</th><th class="pr-3">Space</th><th class="pr-3">Customer</th><th class="pr-3">Date & time</th><th class="pr-3">Status</th><th></th></tr></thead><tbody id="rows"></tbody></table></div>
+    <p id="empty" class="muted text-sm py-6 hidden">No bookings yet. Bookings from the customer site appear here.</p>
+  </section>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <section class="card p-5 sm:p-6 lg:col-span-2">
+      <h2 class="fh text-2xl mb-1">Desk control</h2>
+      <p class="text-xs muted mb-4">Click a space to block it (maintenance, reserved for a client). Blocked spaces show as Taken to customers.</p>
+      <div id="desks" class="flex flex-wrap gap-1.5"></div>
+    </section>
+    <section class="card p-5 sm:p-6 space-y-4">
+      <h2 class="fh text-2xl">Power Hour offer</h2>
+      <label class="block text-sm">Mode<select id="pMode" class="field w-full mt-1 px-3 py-2.5"><option value="auto">Automatic (10:30 to 18:00)</option><option value="on">Always on</option><option value="off">Off</option></select></label>
+      <label class="block text-sm">Discount (%)<input id="pPct" type="number" min="5" max="60" class="field w-full mt-1 px-3 py-2.5"/></label>
+      <button id="pSave" class="btn w-full py-3" type="button">Save offer</button>
+      <p id="pOk" class="text-sm accent hidden">Saved. Customers see it now.</p>
+      <hr style="border-color:var(--line)"/>
+      <button id="wipe" class="zbtn w-full" type="button">Cancel all pending bookings</button>
+    </section>
+  </div>
+  <p class="text-xs muted max-w-3xl">Every action here is sent to the server API and saved in the database, so changes reach customers on any device. Sessions expire after 8 hours.</p>
+</main>
+</div>
+
+<script src="data.js"></script>
+<script src="api.js"></script>
+<script>
+const $ = s => document.querySelector(s), esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const items = build('co');
+let filter = 'all', rows = [], blocked = [], settings = { power: 'auto', pct: 20 };
+const banner = m => { $('#banner').textContent = m || ''; $('#banner').classList.toggle('hidden', !m); };
+
+function show(ok) { $('#gate').classList.toggle('hidden', ok); $('#dash').classList.toggle('hidden', !ok); }
+async function run(fn) {   // one place for errors: expired session sends you back to login
+  try { banner(''); return await fn(); }
+  catch (e) { if (e.status === 401) { API.logout(); show(false); } else banner(e.offline ? 'Backend not reachable. Deploy to Vercel, or run npm run dev locally.' : e.message); }
+}
+async function load() {
+  await run(async () => {
+    const [b, bl, st] = await Promise.all([API.admin('bookings'), API.admin('blocked'), API.admin('settings')]);
+    rows = b.bookings; blocked = bl.blocked; settings = st; show(true); draw();
+  });
+}
+$('#gForm').addEventListener('submit', async e => {
+  e.preventDefault(); $('#gErr').classList.add('hidden');
+  try { await API.login($('#pw').value); $('#pw').value = ''; load(); }
+  catch (err) { $('#gErr').textContent = err.offline ? 'Backend not reachable.' : err.message; $('#gErr').classList.remove('hidden'); }
+});
+$('#out').addEventListener('click', () => { API.logout(); show(false); });
+
+function draw() {
+  const today = new Date().toISOString().slice(0, 10), count = k => rows.filter(b => b.status === k).length;
+  $('#kpi').innerHTML = [[rows.length, 'Bookings'], [count('pending'), 'Pending'], [count('confirmed'), 'Confirmed'], [rows.filter(b => b.date === today && b.status !== 'cancelled').length, 'Today'], [blocked.length, 'Blocked spaces']]
+    .map(c => `<div class="card p-4"><p class="fh text-3xl accent">${c[0]}</p><p class="text-xs muted">${c[1]}</p></div>`).join('');
+  $('#bf').innerHTML = ['all', 'pending', 'confirmed', 'cancelled'].map(k => `<button type="button" data-f="${k}" class="zbtn ${k === filter ? 'on' : ''}">${k[0].toUpperCase() + k.slice(1)}</button>`).join('');
+  const shown = rows.filter(b => filter === 'all' || b.status === filter);
+  $('#empty').classList.toggle('hidden', shown.length > 0);
+  $('#rows').innerHTML = shown.map(b => `<tr class="border-t" style="border-color:var(--line)"><td class="py-3 pr-3 font-semibold">${esc(b.ref)}</td><td class="pr-3">${esc(b.space)}</td><td class="pr-3">${esc(b.name)}<br><span class="text-xs muted">${esc(b.email)}</span></td><td class="pr-3">${esc(b.date)}<br><span class="text-xs muted">${esc(b.slot)}</span></td>
+    <td class="pr-3"><span class="badge ${b.status === 'confirmed' ? 'badge-free' : b.status === 'cancelled' ? 'badge-occ' : 'badge-sel'}">${esc(b.status)}</span></td>
+    <td class="whitespace-nowrap text-right">${b.status === 'pending' ? `<button class="zbtn" data-a="confirmed" data-id="${esc(b.id)}">Confirm</button> ` : ''}${b.status !== 'cancelled' ? `<button class="zbtn" data-a="cancelled" data-id="${esc(b.id)}">Cancel</button>` : `<button class="zbtn" data-a="del" data-id="${esc(b.id)}">Delete</button>`}</td></tr>`).join('');
+  $('#desks').innerHTML = items.map(u => `<button type="button" data-d="${u.id}" aria-pressed="${blocked.includes(u.id)}" class="seat-chip ${blocked.includes(u.id) ? 'occ' : 'free'}" style="min-width:2.6rem">${u.label.replace('Meeting ', 'M').replace('Event space', 'Event')}</button>`).join('');
+  $('#pMode').value = settings.power; $('#pPct').value = settings.pct;
+}
+$('#bf').addEventListener('click', e => { const b = e.target.closest('[data-f]'); if (b) { filter = b.dataset.f; draw(); } });
+$('#rows').addEventListener('click', e => {
+  const b = e.target.closest('[data-a]'); if (!b) return;
+  const q = '?id=' + encodeURIComponent(b.dataset.id);
+  if (b.dataset.a === 'del') { if (confirm('Delete this booking permanently?')) run(async () => { await API.admin('bookings' + q, { method: 'DELETE' }); load(); }); }
+  else if (b.dataset.a === 'cancelled' && !confirm('Cancel this booking? The space becomes free again.')) return;
+  else run(async () => { await API.admin('bookings' + q, { method: 'PATCH', body: JSON.stringify({ status: b.dataset.a }) }); load(); });
+});
+$('#desks').addEventListener('click', e => {
+  const b = e.target.closest('[data-d]'); if (!b) return;
+  const next = blocked.includes(b.dataset.d) ? blocked.filter(x => x !== b.dataset.d) : [...blocked, b.dataset.d];
+  run(async () => { blocked = (await API.admin('blocked', { method: 'PUT', body: JSON.stringify({ blocked: next }) })).blocked; draw(); });
+});
+$('#pSave').addEventListener('click', () => run(async () => {
+  const pct = Math.min(60, Math.max(5, parseInt($('#pPct').value, 10) || 20));
+  settings = await API.admin('settings', { method: 'PUT', body: JSON.stringify({ power: $('#pMode').value, pct }) }); draw();
+  $('#pOk').classList.remove('hidden'); setTimeout(() => $('#pOk').classList.add('hidden'), 2500);
+}));
+$('#wipe').addEventListener('click', () => { if (confirm('Cancel every pending booking?')) run(async () => { for (const b of rows.filter(x => x.status === 'pending')) await API.admin('bookings?id=' + encodeURIComponent(b.id), { method: 'PATCH', body: JSON.stringify({ status: 'cancelled' }) }); load(); }); });
+$('#csv').addEventListener('click', () => {
+  const r = [['Ref', 'Space', 'Name', 'Email', 'Date', 'Time', 'Status', 'Drinks', 'Setup', 'Extras', 'Notes'], ...rows.map(b => [b.ref, b.space, b.name, b.email, b.date, b.slot, b.status, b.drinks, b.setup, (b.extras || []).join('; '), b.notes])];
+  const csv = r.map(x => x.map(v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"').join(',')).join('\n');
+  const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); a.download = 'lumen-yard-bookings.csv'; a.click();
+});
+sessionStorage.getItem('ly_token') ? load() : show(false);
+</script>
+</body>
+</html>

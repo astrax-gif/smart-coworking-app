@@ -46,7 +46,25 @@ function build(b) {
   for (let i = 0; i < 15; i++) { add('O' + (i + 1), 'priv', 20 + i * 37, 14, 33, 46, 'O' + (i + 1)); add('O' + (i + 16), 'priv', 20 + i * 37, 300, 33, 40, 'O' + (i + 16)); }
   for (let r = 0; r < 5; r++) for (let i = 0; i < 20; i++) add('D' + (r * 20 + i + 1), 'flex', 20 + i * 28, 76 + r * 24, 23, 18);
   add('M1', 'room', 20, 208, 110, 74, 'Meeting 1'); add('M2', 'room', 140, 208, 110, 74, 'Meeting 2'); add('E1', 'event', 260, 208, 320, 74, 'Event space');
+  out.forEach(u => {
+    u.zone = u.kind === 'flex' ? (((u.x - 20) / 28 | 0) < 9 ? 'quiet' : 'social') : u.kind === 'priv' ? 'quiet' : 'social';
+    u.sun = u.x < 200 ? 'am' : u.x > 400 ? 'pm' : 'shade';
+    u.deal = u.kind === 'flex' && powerOn();
+    if (getBlocked().includes(u.id)) { u.free = false; u.blocked = true; }
+  });
   return out;
+}
+/* Desk vibe labels. Zones and light are assigned by hand in this demo, not measured. */
+const ZONE = { quiet: 'Quiet zone', social: 'Social zone' };
+const SUN = { am: 'Morning sun', pm: 'Afternoon sun', shade: 'Steady shade' };
+/* Power Hour: free open desks get a flash discount from 10:30 to 18:00. Add ?power to the URL to preview it any time. */
+const POWER = { get pct() { return getSettings().pct || 20; } };
+function powerOn() { const m = getSettings().power || 'auto'; if (m === 'off') return false; if (m === 'on') return true; const t = new Date(), h = t.getHours() + t.getMinutes() / 60; return location.search.includes('power') || (h >= 10.5 && h < 18); }
+/* Demo guest Wi-Fi code. A real build needs the router or access controller to create it. */
+function guestWifi(d) {
+  const cs = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789', r = crypto.getRandomValues(new Uint8Array(8));
+  const c = [...r].map(x => cs[x % cs.length]).join('');
+  return { net: d.wifi.replace('-Members', '') + '-Guest', code: c.slice(0, 4) + '-' + c.slice(4) };
 }
 const AM = {
   flex:[['desk','Ergonomic desk'],['wifi','Fibre Wi-Fi'],['plug','Power and USB-C'],['coffee','Coffee and tea']],
@@ -71,6 +89,11 @@ const PREFS = {
   event: { setup: ['Theatre', 'Cabaret', 'Open floor'], extras: [['mic', 'AV and PA'], ['coffee', 'Catering'], ['users', 'Visitor check-in'], ['monitor', 'Projector']] }
 };
 
+/* Admin controls, shared with admin.html (saved in this browser only in the demo) */
+function getSettings() { try { return JSON.parse(localStorage.getItem('lumen_yard_settings')) || {}; } catch (e) { return {}; } }
+function saveSettings(s) { try { localStorage.setItem('lumen_yard_settings', JSON.stringify(s)); } catch (e) {} }
+function getBlocked() { try { return JSON.parse(localStorage.getItem('lumen_yard_blocked')) || []; } catch (e) { return []; } }
+function saveBlocked(a) { try { localStorage.setItem('lumen_yard_blocked', JSON.stringify(a)); } catch (e) {} }
 /* Bookings are saved in this browser only (demo) */
 const BK_KEY = 'lumen_yard_bookings';
 function getBookings() { try { return JSON.parse(localStorage.getItem(BK_KEY)) || {}; } catch (e) { return {}; } }

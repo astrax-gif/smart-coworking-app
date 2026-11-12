@@ -1,61 +1,86 @@
-<!-- Replace every YOUR_USERNAME below with your GitHub username (the repo must be named exactly the same) -->
+# Lumen Yard · Workspace Booking Platform
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:0b1f3a,100:10b981&height=200&section=header&text=Abdurhman%20Bereket&fontSize=46&fontColor=ffffff&animation=fadeIn&fontAlignY=36&desc=Building%20smart%20workspace%20tech%20for%20Dubai&descAlignY=58&descSize=16" width="100%" alt="header"/>
+A full-stack booking platform for a coworking space: a customer portal with an interactive floor plan, an admin dashboard for staff, and a REST API backed by Postgres.
 
-<p align="center">
-  <a href="https://git.io/typing-svg">
-    <img src="https://readme-typing-svg.demolab.com?font=Sora&weight=600&size=22&pause=1000&color=10B981&center=true&vCenter=true&width=640&lines=Hi%2C+I'm+Abdurhman+%F0%9F%91%8B;Building+smart+workspace+%26+tenant+portals;Coworking+tech+for+Dubai+(DWTC);HTML+%7C+Tailwind+%7C+JavaScript+%7C+AI+concierge" alt="Typing animation" />
-  </a>
-</p>
+> Concept project for a fictional company. Rates and availability are simulated.
 
-<p align="center">
-  <a href="https://www.linkedin.com/in/abdurhmanbereket/"><img src="https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white" alt="LinkedIn"/></a>
-  <a href="mailto:abdurhmanbereket74@gmail.com"><img src="https://img.shields.io/badge/Email-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Email"/></a>
-  <img src="https://komarev.com/ghpvc/?username=YOUR_USERNAME&label=Profile%20views&color=10b981&style=for-the-badge" alt="views"/>
-</p>
+## Features
 
----
+**Customers**
+- Interactive SVG floor plan (desks, private offices, meeting rooms, event space) with live availability
+- Filters for quiet or social zones and morning sun
+- Booking with date, time slot, drinks, seating and extras
+- Instant guest Wi-Fi code and booking reference
+- AI-style support chat, light and dark themes
 
-### 🚀 What I'm working on
+**Staff (admin dashboard)**
+- Password login with expiring sessions
+- See, confirm, cancel and export every booking (CSV)
+- Block spaces for maintenance
+- Control the Power Hour discount (mode and percentage)
 
-**Smart Workspace & Tenant Portal**: a multi-tenant client portal and reception kiosk for coworking spaces and offices around Dubai World Trade Centre.
+**Platform**
+- Server-side validation and double-booking protection (API and database)
+- Rate limiting, constant-time password check, signed session tokens
+- Automated tests and CI on every push
 
-- 🗺️ Interactive SVG floor plans with selectable desks, suites and meeting rooms
-- 📅 Booking flow with confirmation codes
-- 🎨 One-click brand switching with a different theme per business
-- 🤖 AI concierge chat for Wi-Fi, room availability, hours and facility issues
+## Architecture
 
-> Prototype built as a single `index.html` and deployed on Vercel.
+```mermaid
+flowchart LR
+  C[Customer browser<br/>index.html, space.html] -->|REST /api| A
+  S[Staff browser<br/>admin.html] -->|REST /api + token| A
+  subgraph Vercel
+    A[Serverless API<br/>api/*.js] --> L[lib/<br/>validate, auth, store]
+  end
+  L -->|service key| D[(Supabase Postgres<br/>bookings, settings)]
+```
 
-### 🛠️ Tech stack
+| Layer | Where | Role |
+|---|---|---|
+| Front end | `index.html`, `space.html`, `admin.html`, `styles.css`, `data.js`, `api.js` | What people see and click |
+| Back end | `api/`, `lib/` | Rules, security, saving data |
+| Database | `db/schema.sql` | Source of truth, enforces one booking per space, date and slot |
 
-<p align="center">
-  <img src="https://skillicons.dev/icons?i=html,css,js,tailwind,git,github,vercel,vscode&theme=dark" alt="skills"/>
-</p>
+## API
 
-### 🎯 Currently
+| Method | Route | Access | Purpose |
+|---|---|---|---|
+| GET | `/api/availability?date=` | public | Booked and blocked spaces, offer settings |
+| POST | `/api/bookings` | public | Create a booking, returns ref and Wi-Fi code |
+| POST | `/api/admin/login` | public | Password in, session token out |
+| GET / PATCH / DELETE | `/api/admin/bookings` | admin | List, change status, delete |
+| GET / PUT | `/api/admin/blocked` | admin | Spaces out of service |
+| GET / PUT | `/api/admin/settings` | admin | Power Hour offer |
 
-- 🔭 Turning the prototype into a real product with a backend and live bookings
-- 🌱 Learning API integrations and serverless functions
-- 🤝 Open to collaborating on proptech and workspace-tech projects
+Admin routes need `Authorization: Bearer <token>`.
 
-### 📊 GitHub stats
+## Run locally
 
-<p align="center">
-  <img height="165" src="https://github-readme-stats.vercel.app/api?username=YOUR_USERNAME&show_icons=true&theme=tokyonight&hide_border=true" alt="stats"/>
-  <img height="165" src="https://github-readme-stats.vercel.app/api/top-langs/?username=YOUR_USERNAME&layout=compact&theme=tokyonight&hide_border=true" alt="languages"/>
-</p>
+```bash
+npm run dev     # http://localhost:3000, no install needed (Node 18+)
+npm test        # run the automated tests
+```
+With no database configured it runs in demo mode: data lives in memory and the admin password is `admin2026`.
 
-<p align="center">
-  <img src="https://github-readme-activity-graph.vercel.app/graph?username=YOUR_USERNAME&theme=tokyo-night&hide_border=true&area=true" alt="activity graph" width="100%"/>
-</p>
+## Deploy (Vercel + Supabase)
 
-### 🐍 Contribution snake
+1. Create a free project at supabase.com, open **SQL Editor** and run `db/schema.sql`.
+2. In Supabase **Settings → API**, copy the project URL and the `service_role` key.
+3. In Vercel **Settings → Environment Variables**, add the four values from `.env.example`.
+4. Redeploy. Open `/admin.html` and sign in with your `ADMIN_PASSWORD`.
 
-<p align="center">
-  <img src="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_USERNAME/output/github-contribution-grid-snake-dark.svg" alt="snake animation"/>
-</p>
+The `service_role` key is a server secret. It lives only in Vercel and is never put in front-end code or committed.
 
-<p align="center"><i>Let's connect. I reply fast. 👇</i></p>
+## Security notes
 
-<img src="https://capsule-render.vercel.app/api?type=waving&color=0:10b981,100:0b1f3a&height=110&section=footer" width="100%" alt="footer"/>
+- Every input is validated again on the server; the browser is not trusted.
+- Row Level Security is on with no public policies, so only the API can touch the data.
+- Known limits: the rate limiter is in-memory, and the full-day versus slot clash check is application-level (the database enforces same-slot clashes). For production, add Supabase Auth for staff accounts and a shared rate-limit store.
+
+## Roadmap
+
+- Email confirmations (Resend or Postmark)
+- Real guest Wi-Fi provisioning through the access controller
+- Payments and invoices
+- Multi-location support and staff roles

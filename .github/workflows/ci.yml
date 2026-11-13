@@ -25,4 +25,7 @@ jobs:
       env:
         SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
         SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
-      run: npm test
+        PORT: 3000
+      run: |
+        # Point tests to look inside the backend directory if needed, or run npm test
+        npm test

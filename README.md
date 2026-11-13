@@ -1,4 +1,4 @@
-# Lumen Yard · Workspace Booking Platform
+# Lumen Yard · Workspace Booking Platform.
 
 A full-stack booking platform for a coworking space: a customer portal with an interactive floor plan, an admin dashboard for staff, and a REST API backed by Postgres.
 
